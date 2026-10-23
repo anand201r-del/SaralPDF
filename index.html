@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="Free PDF and image tools that run in your browser: image to PDF, merge, compress, resize and remove background. Files never leave your device.">
+<meta name="description" content="Free PDF and image tools that run in your browser: image to PDF, merge, compress, resize, enhance and remove background. Files never leave your device.">
 <title>SaralPDF</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -364,6 +364,33 @@ footer code{font-family:var(--f-mono);font-size:12px}
             </div>
           </div>
 
+          <div data-for="enhance">
+            <div class="panel-b" style="padding:0">
+              <div class="field"><span class="lbl" id="en-mode-l">This is a</span>
+                <div class="seg" role="radiogroup" aria-labelledby="en-mode-l">
+                  <label><input type="radio" name="en-mode" id="en-m-auto" value="auto" checked><span>Auto</span></label>
+                  <label><input type="radio" name="en-mode" id="en-m-photo" value="photo"><span>Photo</span></label>
+                  <label><input type="radio" name="en-mode" id="en-m-doc" value="doc"><span>Document</span></label>
+                </div>
+                <p class="help" id="en-mode-help">Auto treats PDFs as documents and images as photos.</p></div>
+              <div class="field"><span class="lbl" id="en-lvl-l">Strength</span>
+                <div class="seg" role="radiogroup" aria-labelledby="en-lvl-l">
+                  <label><input type="radio" name="en-lvl" id="en-l-low" value="low"><span>Gentle</span></label>
+                  <label><input type="radio" name="en-lvl" id="en-l-med" value="medium" checked><span>Medium</span></label>
+                  <label><input type="radio" name="en-lvl" id="en-l-high" value="high"><span>Strong</span></label>
+                </div></div>
+              <div class="field" id="en-color-field"><label for="en-color">Document colour</label>
+                <select id="en-color">
+                  <option value="colour">Keep colour (stamps, signatures)</option>
+                  <option value="gray" selected>Grayscale</option>
+                  <option value="bw">Black and white · sharpest text</option>
+                </select></div>
+              <div class="field"><label for="en-dpi">PDF page resolution</label>
+                <select id="en-dpi"><option value="150">150 DPI · smaller file</option><option value="200" selected>200 DPI · recommended</option><option value="250">250 DPI · finest detail</option></select>
+                <p class="help">Enhanced PDF pages are saved as images, so text can't be selected afterwards.</p></div>
+            </div>
+          </div>
+
           <div data-for="bgremove">
             <div class="panel-b" style="padding:0">
               <div class="field"><span class="lbl" id="bg-out-l">New background</span>
@@ -430,6 +457,7 @@ const TOOLS={
   pdfcompress:{name:"Compress PDF",hint:"PDF → KB",accept:"pdf",reorder:false,lede:"Make PDFs <strong>small enough to upload or email</strong>. Works best on scanned documents and image-heavy files.",btn:"Compress PDFs",min:1},
   compress:{name:"Compress Image",hint:"MB → KB",accept:"image",reorder:false,lede:"Shrink photos for <strong>online forms, email and WhatsApp</strong>. Pick a quality, or set an exact KB limit.",btn:"Compress images",min:1},
   resize:{name:"Resize Image",hint:"W × H",accept:"image",reorder:false,lede:"Change image dimensions in <strong>pixels or by percentage</strong>.",btn:"Resize images",min:1},
+  enhance:{name:"Enhance Quality",hint:"IMG · PDF",accept:"any",reorder:false,lede:"Make photos <strong>brighter and sharper</strong>, and turn grey, shadowy phone scans into <strong>clean white pages with dark text</strong>. Works on images and every page of a PDF.",btn:"Enhance",min:1},
   bgremove:{name:"Remove Background",hint:"AI · PNG",accept:"image",reorder:false,lede:"Cut out the person or object in a photo and get a <strong>transparent PNG</strong>, or place it on white for ID and form photos. The AI model downloads once, then runs on your device.",btn:"Remove background",min:1}
 };
 const MAX=50*1024*1024;
@@ -441,6 +469,7 @@ let uid=0;
 function fmt(n){if(n<1024)return n+" B";if(n<1048576){const k=n/1024;return (k<100?k.toFixed(1):Math.round(k))+" KB";}return (n/1048576).toFixed(n<10485760?2:1)+" MB";}
 function base(name){return name.replace(/\.[^.]+$/,"")||"file";}
 function extFor(type){return {"image/jpeg":"jpg","image/png":"png","image/webp":"webp"}[type]||"jpg";}
+function accepts(tool,kind){return tool.accept==="any"?(kind==="image"||kind==="pdf"):kind===tool.accept;}
 function kindOf(f){
   if(f.type==="application/pdf"||/\.pdf$/i.test(f.name))return"pdf";
   if(/\.(heic|heif)$/i.test(f.name)||/heic|heif/.test(f.type))return"heic";
@@ -500,7 +529,7 @@ function addFiles(list){
   for(const f of arr){
     const k=kindOf(f);
     if(k==="heic"){addErr("“"+f.name+"” is an iPhone HEIC photo, which browsers can't read yet. Change your camera to “Most Compatible” or export it as JPG first.");continue;}
-    if(k!==tool.accept){addErr("“"+f.name+"” isn't "+(tool.accept==="pdf"?"a PDF":"an image")+". "+tool.name+" needs "+(tool.accept==="pdf"?"PDF files.":"JPG, PNG or WebP images."));continue;}
+    if(!accepts(tool,k)){addErr("“"+f.name+"” isn't "+(tool.accept==="any"?"an image or PDF":tool.accept==="pdf"?"a PDF":"an image")+". "+tool.name+" needs "+(tool.accept==="any"?"JPG, PNG, WebP or PDF files.":tool.accept==="pdf"?"PDF files.":"JPG, PNG or WebP images."));continue;}
     if(f.size>MAX){addErr("“"+f.name+"” is "+fmt(f.size)+". The limit is 50 MB per file.");continue;}
     if(!added)st.files=st.files.filter(x=>!x.sample);
     const item={id:++uid,file:f,name:f.name||("pasted-"+uid+".png"),size:f.size,kind:k,thumb:null,info:"Reading…"};
@@ -594,8 +623,9 @@ function render(){
   const tool=TOOLS[st.tool];
   renderTools();
   $("#lede").innerHTML=tool.lede;
-  $("#drop-title").textContent=tool.accept==="pdf"?"Drop PDF files here":"Drop images here";
-  $("#picker").accept=tool.accept==="pdf"?"application/pdf,.pdf":"image/*";
+  $("#drop-title").textContent=tool.accept==="any"?"Drop images or PDFs here":tool.accept==="pdf"?"Drop PDF files here":"Drop images here";
+  $("#picker").accept=tool.accept==="any"?"image/*,application/pdf,.pdf":tool.accept==="pdf"?"application/pdf,.pdf":"image/*";
+  if(st.tool==="enhance")syncEnhanceUI();
   document.querySelectorAll("[data-for]").forEach(el=>el.hidden=el.dataset.for!==st.tool);
   renderFiles();updateRun();renderResults();showErrors();
 }
@@ -799,7 +829,98 @@ async function runBgRemove(files){
 }
 document.querySelectorAll('input[name="bg-out"]').forEach(r=>r.addEventListener("change",()=>{$("#bg-color-field").hidden=radio("bg-out")!=="color";}));
 $("#bg-swatches").addEventListener("click",e=>{const c=e.target.closest("[data-color]");if(c)$("#bg-color").value=c.dataset.color;});
-const RUN={img2pdf:runImg2Pdf,pdf2img:runPdf2Img,merge:runMerge,pdfcompress:runPdfCompress,compress:runCompress,resize:runResize,bgremove:runBgRemove};
+/* ---------- enhance ---------- */
+const ENH={
+  photo:{low:{lo:.002,hi:.998,sat:.08,sharp:.25},medium:{lo:.005,hi:.995,sat:.15,sharp:.5},high:{lo:.01,hi:.99,sat:.25,sharp:.85}},
+  doc:{low:{lo:.01,hi:.98,sat:0,sharp:.2},medium:{lo:.03,hi:.95,sat:0,sharp:.4},high:{lo:.06,hi:.9,sat:0,sharp:.7}}
+};
+function lumHist(d){const h=new Uint32Array(256);for(let i=0;i<d.length;i+=4)h[(d[i]*77+d[i+1]*150+d[i+2]*29)>>8]++;return h;}
+function levels(d,lo,hi){
+  const h=lumHist(d),n=d.length/4;let c=0,lv=0,hv=255;
+  for(let v=0;v<256;v++){c+=h[v];if(c>=n*lo){lv=v;break;}}
+  c=0;for(let v=255;v>=0;v--){c+=h[v];if(c>=n*(1-hi)){hv=v;break;}}
+  if(hv-lv<24)return;const s=255/(hv-lv);
+  for(let i=0;i<d.length;i+=4){d[i]=(d[i]-lv)*s;d[i+1]=(d[i+1]-lv)*s;d[i+2]=(d[i+2]-lv)*s;}
+}
+function saturate(d,a){for(let i=0;i<d.length;i+=4){const g=(d[i]*77+d[i+1]*150+d[i+2]*29)>>8;d[i]=g+(d[i]-g)*(1+a);d[i+1]=g+(d[i+1]-g)*(1+a);d[i+2]=g+(d[i+2]-g)*(1+a);}}
+function toGray(d){for(let i=0;i<d.length;i+=4){const g=(d[i]*77+d[i+1]*150+d[i+2]*29)>>8;d[i]=d[i+1]=d[i+2]=g;}}
+function sharpen(d,w,h,a){
+  const s=d.slice(),r=w*4;
+  for(let y=1;y<h-1;y++){let i=y*r+4;for(let x=1;x<w-1;x++,i+=4){
+    for(let k=0;k<3;k++){const j=i+k,c=s[j];d[j]=c+a*(4*c-s[j-4]-s[j+4]-s[j-r]-s[j+r]);}}}
+}
+function otsu(d){const h=lumHist(d),n=d.length/4;let sum=0;for(let i=0;i<256;i++)sum+=i*h[i];
+  let sB=0,wB=0,best=0,t=128;for(let i=0;i<256;i++){wB+=h[i];if(!wB)continue;const wF=n-wB;if(!wF)break;sB+=i*h[i];
+    const mB=sB/wB,mF=(sum-sB)/wF,v=wB*wF*(mB-mF)*(mB-mF);if(v>best){best=v;t=i;}}return t;}
+function threshold(d,t){for(let i=0;i<d.length;i+=4){const v=d[i]>t?255:0;d[i]=d[i+1]=d[i+2]=v;}}
+function backgroundOf(c){
+  const w=c.width,h=c.height,sw=Math.max(8,Math.round(w/24)),sh=Math.max(8,Math.round(h/24));
+  const sm=document.createElement("canvas");sm.width=sw;sm.height=sh;const sx=sm.getContext("2d",{willReadFrequently:true});
+  sx.imageSmoothingQuality="high";sx.drawImage(c,0,0,sw,sh);
+  const im=sx.getImageData(0,0,sw,sh);let d=im.data;
+  for(let it=0;it<3;it++){const s=d.slice();
+    for(let y=0;y<sh;y++)for(let x=0;x<sw;x++){const i=(y*sw+x)*4;
+      for(let k=0;k<3;k++){let m=0;for(let dy=-1;dy<=1;dy++){const yy=y+dy;if(yy<0||yy>=sh)continue;for(let dx=-1;dx<=1;dx++){const xx=x+dx;if(xx<0||xx>=sw)continue;const v=s[(yy*sw+xx)*4+k];if(v>m)m=v;}}d[i+k]=m;}}}
+  sx.putImageData(im,0,0);
+  const big=document.createElement("canvas");big.width=w;big.height=h;const bx=big.getContext("2d",{willReadFrequently:true});
+  bx.imageSmoothingEnabled=true;bx.imageSmoothingQuality="high";bx.drawImage(sm,0,0,w,h);
+  const out=bx.getImageData(0,0,w,h).data;big.width=big.height=0;return out;
+}
+function enhanceCanvas(c,mode,lvl,color){
+  const w=c.width,h=c.height,ctx=c.getContext("2d",{willReadFrequently:true});const P=ENH[mode][lvl];
+  const bg=mode==="doc"?backgroundOf(c):null;
+  const im=ctx.getImageData(0,0,w,h),d=im.data;
+  if(bg){for(let i=0;i<d.length;i+=4){d[i]=d[i]*255/(bg[i]||1);d[i+1]=d[i+1]*255/(bg[i+1]||1);d[i+2]=d[i+2]*255/(bg[i+2]||1);}}
+  if(mode==="doc"&&color!=="colour")toGray(d);
+  levels(d,P.lo,P.hi);
+  if(P.sat)saturate(d,P.sat);
+  if(P.sharp)sharpen(d,w,h,P.sharp);
+  if(mode==="doc"&&color==="bw")threshold(d,otsu(d));
+  ctx.putImageData(im,0,0);
+}
+async function runEnhance(files){
+  const {PDFDocument}=PDFLib;const pick=radio("en-mode"),lvl=radio("en-lvl"),color=$("#en-color").value,dpi=+$("#en-dpi").value;
+  const total=files.reduce((a,f)=>a+(f.kind==="pdf"?(f.pages||1):1),0);let done=0;const items=[];
+  for(const f of files){
+    const mode=pick==="auto"?(f.kind==="pdf"?"doc":"photo"):pick;
+    try{
+      if(f.kind==="pdf"){
+        const d=await pdfjsLib.getDocument({data:new Uint8Array(await f.file.arrayBuffer())}).promise;const out=await PDFDocument.create();
+        for(let p=1;p<=d.numPages;p++){
+          prog(done,total,"Enhancing page "+p+" of "+d.numPages+" · "+f.name);await tick();
+          const page=await d.getPage(p);const v1=page.getViewport({scale:1});let scale=dpi/72;
+          if(Math.max(v1.width,v1.height)*scale>5000)scale=5000/Math.max(v1.width,v1.height);
+          const v=page.getViewport({scale});const c=document.createElement("canvas");c.width=Math.ceil(v.width);c.height=Math.ceil(v.height);
+          const ctx=c.getContext("2d",{willReadFrequently:true});ctx.fillStyle="#fff";ctx.fillRect(0,0,c.width,c.height);
+          await page.render({canvasContext:ctx,viewport:v}).promise;await tick();
+          enhanceCanvas(c,mode,lvl,color);
+          const jpg=await toBlob(c,"image/jpeg",mode==="doc"&&color==="bw"?0.8:0.86);
+          out.addPage([v1.width,v1.height]).drawImage(await out.embedJpg(await jpg.arrayBuffer()),{x:0,y:0,width:v1.width,height:v1.height});
+          c.width=c.height=0;done++;
+        }
+        const blob=new Blob([await out.save({useObjectStreams:true})],{type:"application/pdf"});
+        items.push({name:base(f.name)+"-enhanced.pdf",blob,before:f.size,dims:d.numPages+(d.numPages===1?" page":" pages")+" · "+(mode==="doc"?"document":"photo")});
+        d.destroy();
+      }else{
+        prog(done,total,"Enhancing "+f.name);await tick();
+        const img=await imgFromFile(f.file);let w=img.naturalWidth,h=img.naturalHeight;const cap=8000;if(Math.max(w,h)>cap){const s=cap/Math.max(w,h);w*=s;h*=s;}
+        const orig=["image/jpeg","image/png","image/webp"].includes(f.file.type)?f.file.type:"image/jpeg";
+        const c=canvasFor(img,w,h,orig==="image/jpeg");await tick();
+        enhanceCanvas(c,mode,lvl,color);
+        const blob=await toBlob(c,orig,0.92);
+        items.push({name:base(f.name)+"-enhanced."+extFor(blob.type||orig),blob,before:f.size,dims:c.width+" × "+c.height+" px · "+(mode==="doc"?"document":"photo"),preview:URL.createObjectURL(blob)});
+        done++;
+      }
+    }catch(e){addErr(isLockedErr(e)?"Skipped “"+f.name+"”: it's password-protected.":"Skipped “"+f.name+"”: it couldn't be read.");done++;}
+  }
+  if(!items.length)throw new Error("Nothing could be enhanced.");
+  const L={low:"Gentle",medium:"Medium",high:"Strong"}[lvl];
+  return {items,compare:false,label:L+" enhancement · "+items.length+(items.length===1?" file":" files"),zipName:"saralpdf-enhanced.zip"};
+}
+function syncEnhanceUI(){const m=radio("en-mode");$("#en-color-field").hidden=m==="photo";
+  $("#en-mode-help").textContent={auto:"Auto treats PDFs as documents and images as photos.",photo:"Brightens, balances contrast, boosts colour and sharpens.",doc:"Removes shadows, whitens the paper and darkens the text."}[m];}
+document.querySelectorAll('input[name="en-mode"]').forEach(r=>r.addEventListener("change",syncEnhanceUI));
+const RUN={img2pdf:runImg2Pdf,pdf2img:runPdf2Img,merge:runMerge,pdfcompress:runPdfCompress,compress:runCompress,resize:runResize,enhance:runEnhance,bgremove:runBgRemove};
 document.querySelectorAll('input[name="pc-level"]').forEach(r=>r.addEventListener("change",()=>{$("#pc-help").textContent=PC_LEVEL[radio("pc-level")].help;}));
 
 async function run(){
@@ -821,8 +942,9 @@ function ratio(){const f=st.files.find(x=>x.w);return f?f.h/f.w:null;}
 /* ---------- events ---------- */
 $("#tools").addEventListener("click",e=>{
   const b=e.target.closest("[data-tool]");if(!b||st.busy)return;const t=b.dataset.tool;if(t===st.tool)return;
-  const prevAccept=TOOLS[st.tool].accept;st.tool=t;st.results=null;errs=[];
-  if(TOOLS[t].accept!==prevAccept){st.files=[];if(TOOLS[t].accept==="image")loadSamples();}
+  st.tool=t;st.results=null;errs=[];
+  st.files=st.files.filter(f=>accepts(TOOLS[t],f.kind));
+  if(!st.files.length&&accepts(TOOLS[t],"image"))loadSamples();
   if(t==="resize")syncResizeDefaults();
   render();
 });
@@ -892,6 +1014,7 @@ async function makeSample(kind){
     x.font="bold 36px Arial,sans-serif";x.fillText("Total",90,760);x.textAlign="right";x.fillText("₹ 67,200",1150,760);x.textAlign="left";
     x.fillStyle="#e4e6ee";for(let i=0;i<14;i++)x.fillRect(90,880+i*46,(i%3===2?700:1060),14);
     x.strokeStyle="#b3261e";x.lineWidth=6;x.beginPath();x.arc(980,1500,110,0,Math.PI*2);x.stroke();x.fillStyle="#b3261e";x.font="bold 34px Arial";x.textAlign="center";x.fillText("PAID",980,1512);x.textAlign="left";
+    const sh=x.createRadialGradient(300,300,200,700,1100,1500);sh.addColorStop(0,"rgba(90,80,60,0.08)");sh.addColorStop(1,"rgba(60,50,40,0.42)");x.fillStyle=sh;x.fillRect(0,0,c.width,c.height);
   }else{
     c.width=1600;c.height=1000;const g=x.createLinearGradient(0,0,0,1000);g.addColorStop(0,"#f6c27a");g.addColorStop(.55,"#e9876b");g.addColorStop(1,"#5b4b8a");x.fillStyle=g;x.fillRect(0,0,1600,1000);
     x.fillStyle="#fff3d6";x.beginPath();x.arc(1150,420,110,0,Math.PI*2);x.fill();
@@ -905,7 +1028,7 @@ async function makeSample(kind){
 async function loadSamples(){
   try{
     const fs=await Promise.all([makeSample("doc"),makeSample("photo")]);
-    if(st.files.length||TOOLS[st.tool].accept!=="image")return;
+    if(st.files.length||!accepts(TOOLS[st.tool],"image"))return;
     fs.forEach(f=>{const it={id:++uid,file:f,name:f.name,size:f.size,kind:"image",thumb:null,info:"Reading…",sample:true};st.files.push(it);makeThumb(it);});
     render();
   }catch(e){}
