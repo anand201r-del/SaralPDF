@@ -3,7 +3,61 @@
   <url>
     <loc>https://saralpdf.in/</loc>
     <lastmod>2026-10-24</lastmod>
-    <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://saralpdf.in/guides/</loc>
+    <lastmod>2026-10-24</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://saralpdf.in/guides/compress-photo-to-20kb-50kb/</loc>
+    <lastmod>2026-10-24</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://saralpdf.in/guides/photo-signature-size-cm-to-pixels/</loc>
+    <lastmod>2026-10-24</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://saralpdf.in/guides/merge-pdf-files/</loc>
+    <lastmod>2026-10-24</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://saralpdf.in/guides/phone-photos-to-pdf/</loc>
+    <lastmod>2026-10-24</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://saralpdf.in/guides/reduce-pdf-size/</loc>
+    <lastmod>2026-10-24</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://saralpdf.in/guides/white-background-photo/</loc>
+    <lastmod>2026-10-24</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://saralpdf.in/about/</loc>
+    <lastmod>2026-10-24</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://saralpdf.in/contact/</loc>
+    <lastmod>2026-10-24</lastmod>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://saralpdf.in/privacy/</loc>
+    <lastmod>2026-10-24</lastmod>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://saralpdf.in/terms/</loc>
+    <lastmod>2026-10-24</lastmod>
+    <priority>0.3</priority>
   </url>
 </urlset>

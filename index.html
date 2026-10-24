@@ -10,6 +10,10 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/site.webmanifest">
 <meta name="theme-color" content="#2445c4">
+<meta property="og:title" content="SaralPDF – Free PDF and Image Tools">
+<meta property="og:description" content="Convert, merge, compress and resize PDFs and photos for online forms. Files never leave your device.">
+<meta property="og:url" content="https://saralpdf.in/">
+<meta property="og:image" content="https://saralpdf.in/icon-512.png">
 <title>SaralPDF – Free PDF and Image Tools | Compress, Merge, Resize</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -213,6 +217,19 @@ input[type=number]{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
 footer{color:var(--muted);font-size:12.5px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;border-top:1px solid var(--line);padding-top:14px}
 footer{font-size:13.5px;align-items:center}
 html{scroll-behavior:smooth}
+.guides{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+.guides-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.guides-head h2{margin:0;font:700 20px var(--f-display);letter-spacing:-.01em}
+.guides-head a{color:var(--accent);font-weight:600;font-size:14px;text-decoration:none}
+.g-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:900px){.g-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.g-grid{grid-template-columns:minmax(0,1fr)}}
+.g-card{display:flex;flex-direction:column;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;text-decoration:none;color:var(--ink);transition:border-color .15s}
+.g-card:hover{border-color:var(--accent)}
+.g-k{font:600 11px var(--f-mono);color:var(--accent);text-transform:uppercase;letter-spacing:.06em}
+.g-t{font-weight:600;font-size:15px;line-height:1.35}
+.info-card a:not(.btn){font-size:14px}
+
 .modal-bg{position:fixed;inset:0;background:rgba(10,14,30,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:30}
 .modal{position:relative;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);width:100%;max-width:440px;padding:24px;display:flex;flex-direction:column;gap:12px}
 .modal h2{margin:0;font:700 20px var(--f-display)}
@@ -240,8 +257,8 @@ html{scroll-behavior:smooth}
     </a>
     <nav class="nav" aria-label="Main">
       <a href="#tools-sec" class="nav-hide">Tools</a>
-      <a href="#about">About</a>
-      <a href="#privacy" class="nav-hide">Privacy</a>
+      <a href="/guides/">Guides</a>
+      <a href="/about/" class="nav-hide">About</a>
       <button type="button" class="btn fb" data-feedback>
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2.5 3.5h11v7h-6l-3 2.5v-2.5h-2z"/></svg>Feedback</button>
     </nav>
@@ -478,6 +495,18 @@ html{scroll-behavior:smooth}
     </div>
   </div>
 
+  <section class="guides" aria-labelledby="guides-h">
+    <div class="guides-head"><h2 id="guides-h">Step-by-step guides</h2><a href="/guides/">All guides →</a></div>
+    <div class="g-grid">
+      <a class="g-card" href="/guides/compress-photo-to-20kb-50kb/"><span class="g-k">Exam &amp; job forms</span><span class="g-t">How to compress a photo to 20 KB or 50 KB for online forms</span></a>
+      <a class="g-card" href="/guides/photo-signature-size-cm-to-pixels/"><span class="g-k">Exam &amp; job forms</span><span class="g-t">Photo and signature size: converting cm to pixels</span></a>
+      <a class="g-card" href="/guides/merge-pdf-files/"><span class="g-k">PDF</span><span class="g-t">How to merge PDF files into one</span></a>
+      <a class="g-card" href="/guides/phone-photos-to-pdf/"><span class="g-k">PDF</span><span class="g-t">How to turn phone photos of documents into a clean PDF</span></a>
+      <a class="g-card" href="/guides/reduce-pdf-size/"><span class="g-k">PDF</span><span class="g-t">How to reduce PDF size for upload</span></a>
+      <a class="g-card" href="/guides/white-background-photo/"><span class="g-k">Photos</span><span class="g-t">How to make a photo background white</span></a>
+    </div>
+  </section>
+
   <section class="info" aria-label="About SaralPDF">
     <div class="info-card" id="about">
       <h2>About SaralPDF</h2>
@@ -492,6 +521,7 @@ html{scroll-behavior:smooth}
         <li>Photos you re-save have hidden location (GPS) data removed.</li>
         <li>Remove Background downloads its AI model once. Your photos still stay on your device.</li>
       </ul>
+      <a href="/privacy/">Read the full Privacy Policy</a>
     </div>
     <div class="info-card" id="feedback">
       <h2>Feedback</h2>
@@ -502,7 +532,7 @@ html{scroll-behavior:smooth}
 
   <footer>
     <span>© 2026 SaralPDF · Made in India</span>
-    <span class="foot-links"><a href="#about">About</a><a href="#privacy">Privacy</a><a href="#feedback" data-feedback>Feedback</a></span>
+    <span class="foot-links"><a href="/guides/">Guides</a><a href="/about/">About</a><a href="/privacy/">Privacy Policy</a><a href="/terms/">Terms</a><a href="/contact/">Contact</a></span>
   </footer>
 </div>
 <div class="modal-bg" id="fb-modal" hidden>
@@ -1021,14 +1051,20 @@ function syncResizeDefaults(){
 function ratio(){const f=st.files.find(x=>x.w);return f?f.h/f.w:null;}
 
 /* ---------- events ---------- */
-$("#tools").addEventListener("click",e=>{
-  const b=e.target.closest("[data-tool]");if(!b||st.busy)return;const t=b.dataset.tool;if(t===st.tool)return;
+const SLUG={img2pdf:"image-to-pdf",pdf2img:"pdf-to-image",merge:"merge-pdf",pdfcompress:"compress-pdf",compress:"compress-image",resize:"resize-image",enhance:"enhance",bgremove:"remove-background"};
+const FROM_SLUG=Object.fromEntries(Object.entries(SLUG).map(([k,v])=>[v,k]));
+function selectTool(t,fromHash){
+  if(!TOOLS[t]||st.busy||t===st.tool)return;
   st.tool=t;st.results=null;errs=[];
   st.files=st.files.filter(f=>accepts(TOOLS[t],f.kind));
   if(!st.files.length&&accepts(TOOLS[t],"image"))loadSamples();
   if(t==="resize")syncResizeDefaults();
   render();
-});
+  if(!fromHash){try{history.replaceState(null,"","#"+SLUG[t]);}catch(_){}}
+}
+$("#tools").addEventListener("click",e=>{const b=e.target.closest("[data-tool]");if(b)selectTool(b.dataset.tool);});
+function toolFromHash(){const h=(location.hash||"").slice(1);return FROM_SLUG[h]||null;}
+window.addEventListener("hashchange",()=>{const t=toolFromHash();if(t){selectTool(t,true);$("#tools-sec").scrollIntoView({block:"start"});}});
 const picker=$("#picker");picker.addEventListener("change",()=>{addFiles(picker.files);picker.value="";});
 const drop=$("#drop");
 ["dragenter","dragover"].forEach(ev=>drop.addEventListener(ev,e=>{if(e.dataTransfer&&[...e.dataTransfer.types].includes("Files")){e.preventDefault();drop.classList.add("over");}}));
@@ -1133,7 +1169,9 @@ $("#fb-copy").addEventListener("click",async()=>{
   catch(_){const r=document.createRange();r.selectNodeContents($("#fb-email"));const s=getSelection();s.removeAllRanges();s.addRange(r);toast("Press Ctrl + C to copy");}
 });
 
+const startTool=toolFromHash();if(startTool)st.tool=startTool;
 render();loadSamples();
+if(startTool)requestAnimationFrame(()=>$("#tools-sec").scrollIntoView({block:"start"}));
 })();
 </script>
 
