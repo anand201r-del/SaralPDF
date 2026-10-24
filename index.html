@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Free online PDF and image tools: image to PDF, merge PDF, compress PDF, compress image to 20 KB or 50 KB, resize, enhance scans and remove background. Files never leave your device.">
 <link rel="canonical" href="https://saralpdf.in/">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#2445c4">
 <title>SaralPDF – Free PDF and Image Tools | Compress, Merge, Resize</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -208,9 +213,18 @@ input[type=number]{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
 footer{color:var(--muted);font-size:12.5px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;border-top:1px solid var(--line);padding-top:14px}
 footer{font-size:13.5px;align-items:center}
 html{scroll-behavior:smooth}
+.modal-bg{position:fixed;inset:0;background:rgba(10,14,30,.55);display:flex;align-items:center;justify-content:center;padding:16px;z-index:30}
+.modal{position:relative;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);width:100%;max-width:440px;padding:24px;display:flex;flex-direction:column;gap:12px}
+.modal h2{margin:0;font:700 20px var(--f-display)}
+.modal p{margin:0;color:var(--muted);font-size:14px}
+.modal-x{position:absolute;top:12px;right:12px}
+.mail-row{display:flex;align-items:center;gap:8px;background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:6px 6px 6px 12px}
+.mail{flex:1;min-width:0;font:500 14px var(--f-mono);overflow-wrap:anywhere;user-select:all}
+.mail-actions{display:flex;flex-wrap:wrap;gap:8px}
+.mail-actions .btn{flex:1;text-decoration:none}
 
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);
-  padding:10px 16px;border-radius:10px;font-size:14px;box-shadow:var(--shadow);max-width:calc(100% - 32px);z-index:20}
+  padding:10px 16px;border-radius:10px;font-size:14px;box-shadow:var(--shadow);max-width:calc(100% - 32px);z-index:40}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -228,8 +242,8 @@ html{scroll-behavior:smooth}
       <a href="#tools-sec" class="nav-hide">Tools</a>
       <a href="#about">About</a>
       <a href="#privacy" class="nav-hide">Privacy</a>
-      <a class="btn fb" href="https://github.com/anand201r-del/SaralPDF/issues/new" target="_blank" rel="noopener">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2.5 3.5h11v7h-6l-3 2.5v-2.5h-2z"/></svg>Feedback</a>
+      <button type="button" class="btn fb" data-feedback>
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2.5 3.5h11v7h-6l-3 2.5v-2.5h-2z"/></svg>Feedback</button>
     </nav>
   </header>
 
@@ -482,14 +496,26 @@ html{scroll-behavior:smooth}
     <div class="info-card" id="feedback">
       <h2>Feedback</h2>
       <p>Found a bug, or want a new tool such as Split PDF or exam photo presets? Tell us and it may be in the next update.</p>
-      <a class="btn primary" href="https://github.com/anand201r-del/SaralPDF/issues/new" target="_blank" rel="noopener">Send feedback</a>
+      <button type="button" class="btn primary" data-feedback>Send feedback</button>
     </div>
   </section>
 
   <footer>
     <span>© 2026 SaralPDF · Made in India</span>
-    <span class="foot-links"><a href="#about">About</a><a href="#privacy">Privacy</a><a href="#feedback">Feedback</a><a href="https://github.com/anand201r-del/SaralPDF" target="_blank" rel="noopener">GitHub</a></span>
+    <span class="foot-links"><a href="#about">About</a><a href="#privacy">Privacy</a><a href="#feedback" data-feedback>Feedback</a></span>
   </footer>
+</div>
+<div class="modal-bg" id="fb-modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="fb-title">
+    <button type="button" class="icon-btn modal-x" id="fb-close" aria-label="Close"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
+    <h2 id="fb-title">Send feedback</h2>
+    <p>Found a bug, or want a new tool? Email us and mention which tool you used. We read every message.</p>
+    <div class="mail-row"><span class="mail" id="fb-email"></span><button type="button" class="btn" id="fb-copy">Copy</button></div>
+    <div class="mail-actions">
+      <a class="btn primary" id="fb-gmail" target="_blank" rel="noopener">Open in Gmail</a>
+      <a class="btn" id="fb-mailto">Use email app</a>
+    </div>
+  </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
@@ -1088,6 +1114,24 @@ async function loadSamples(){
     render();
   }catch(e){}
 }
+
+/* ---------- feedback ---------- */
+const FB_MAIL=["anandd201r","gmail.com"].join("@");
+const fbSub=encodeURIComponent("SaralPDF feedback");
+$("#fb-email").textContent=FB_MAIL;
+$("#fb-gmail").href="https://mail.google.com/mail/?view=cm&fs=1&to="+FB_MAIL+"&su="+fbSub;
+$("#fb-mailto").href="mailto:"+FB_MAIL+"?subject="+fbSub;
+const fbModal=$("#fb-modal");let fbLast=null;
+function openFb(){fbLast=document.activeElement;fbModal.hidden=false;$("#fb-copy").focus();}
+function closeFb(){fbModal.hidden=true;if(fbLast&&fbLast.focus)fbLast.focus();}
+document.addEventListener("click",e=>{const t=e.target.closest("[data-feedback]");if(t){e.preventDefault();openFb();}});
+$("#fb-close").addEventListener("click",closeFb);
+fbModal.addEventListener("click",e=>{if(e.target===fbModal)closeFb();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!fbModal.hidden)closeFb();});
+$("#fb-copy").addEventListener("click",async()=>{
+  try{await navigator.clipboard.writeText(FB_MAIL);toast("Email address copied");}
+  catch(_){const r=document.createRange();r.selectNodeContents($("#fb-email"));const s=getSelection();s.removeAllRanges();s.addRange(r);toast("Press Ctrl + C to copy");}
+});
 
 render();loadSamples();
 })();
