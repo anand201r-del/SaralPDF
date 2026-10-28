@@ -18,13 +18,18 @@ Simple PDF and image tools that run entirely in the browser. Files are processed
 | Enhance Quality | Photos: auto contrast, colour boost and sharpening. Documents and PDFs: removes shadows, whitens paper, darkens text, with colour, grayscale or black-and-white output |
 | Remove Background | AI cut-out to transparent PNG, or onto white / a custom colour as JPG |
 
-Shared features: English / Hindi switch, a separate page for every tool, iPhone HEIC support in all image tools, drag-and-drop, file picker, paste with Ctrl+V, batch processing, thumbnails, drag-to-reorder (plus arrow buttons for phones), file type and 50 MB size checks, progress bar, before/after sizes, ZIP download, mobile layout, light and dark themes.
+Shared features: searchable tool directory, continue-with-this-file chaining between tools, English / Hindi switch, a separate page for every tool, iPhone HEIC support in all image tools, drag-and-drop, file picker, paste with Ctrl+V, batch processing, thumbnails, drag-to-reorder (plus arrow buttons for phones), file type and 50 MB size checks, progress bar, before/after sizes, ZIP download, mobile layout, light and dark themes.
+
+## Architecture
+
+See **[ARCHITECTURE.md](ARCHITECTURE.md)** for diagrams of the system, page model, processing pipelines, key algorithms, the Hindi language switch and deployment.
 
 ## Project structure
 
 - `index.html` plus one folder per tool (`compress-image/`, `merge-pdf/`, …): each page has its own title, description, how-to and FAQ for Google.
 - `assets/app.js`, `assets/app.css`: the app shared by every tool page.
 - `assets/i18n-core.js`, `assets/hi.js`: the language switch and Hindi translations (English text is the key).
+- `assets/ui.js`: tools menu, home search and feedback dialog.
 - `guides/`, `about/`, `privacy/`, `terms/`, `contact/`: content pages using `assets/site.css`.
 - `sitemap.xml`, `robots.txt`, icons and `site.webmanifest`.
 

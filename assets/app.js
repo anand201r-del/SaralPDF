@@ -98,7 +98,7 @@ const dlReady=(window.claude&&typeof window.claude.use==="function")?window.clau
 async function save(blob,filename){
   const dl=await dlReady;
   if(dl){
-    try{await dl.save({filename,data:blob});toast(t("Saved {name}",{name:filename}));}
+    try{await dl.save({filename,data:blob});toast(t("Downloaded {name}",{name:filename}));}
     catch(e){const c=e&&e.code;toast(c==="declined"?t("Save cancelled"):t("Saving isn't available in this view"));}
     return;
   }
@@ -112,7 +112,7 @@ async function saveZip(){
   r.items.forEach((it,i)=>zip.file(names[i],it.blob));
   const btn=$("#zip-btn");if(btn){btn.disabled=true;btn.textContent=t("Packing ZIP…");}
   const blob=await zip.generateAsync({type:"blob",compression:"STORE"});
-  if(btn){btn.disabled=false;btn.textContent=t("Save all as ZIP");}
+  if(btn){btn.disabled=false;btn.textContent=t("Download all (ZIP)");}
   save(blob,r.zipName);
 }
 
@@ -201,14 +201,14 @@ function renderFiles(){
     '<li class="file'+(f.bad?" bad":"")+(tool.editor?" clickable":"")+(tool.editor&&st.sel===f.id?" sel":"")+'" data-id="'+f.id+'"'+(tool.reorder?' draggable="true"':'')+'>'+
       '<div class="ord" title="'+(tool.reorder?esc(t("Drag to reorder")):"")+'">'+(tool.reorder?ICO.grip:"")+'<span>'+(i+1)+'</span></div>'+
       '<div class="thumb'+(f.kind==="pdf"?" pdf":"")+'">'+(f.thumb?'<img alt="" src="'+f.thumb+'">':'<span class="ph">'+(f.kind==="pdf"?"PDF":"IMG")+'</span>')+'</div>'+
-      '<div style="min-width:0"><div class="fname">'+esc(f.name)+(f.sample?'<span class="badge">'+esc(t("Example"))+'</span>':'')+'</div><div class="finfo">'+fmt(f.size)+' · '+esc(f.info)+'</div></div>'+
+      '<div style="min-width:0"><div class="fname">'+esc(f.name)+(f.sample?'<span class="badge">'+esc(t("Example"))+'</span>':'')+'</div><div class="finfo"><span>'+fmt(f.size)+'</span><span>'+esc(f.info)+'</span></div></div>'+
       '<div class="row-act">'+
         (tool.reorder?'<button type="button" class="icon-btn" data-act="up" aria-label="'+esc(t("Move up"))+'"'+(i===0?" disabled":"")+'>'+ICO.up+'</button>'+
         '<button type="button" class="icon-btn" data-act="down" aria-label="'+esc(t("Move down"))+'"'+(i===n-1?" disabled":"")+'>'+ICO.down+'</button>':'')+
         '<button type="button" class="icon-btn rm" data-act="rm" aria-label="'+esc(t("Remove"))+'">'+ICO.x+'</button>'+
       '</div></li>').join("");
   $("#files-empty").hidden=n>0;
-  $("#file-count").textContent=n?"· "+n:"";
+  $("#file-count").textContent=n?"("+n+")":"";
   const total=st.files.reduce((a,f)=>a+f.size,0);
   const pg=st.files.reduce((a,f)=>a+(f.pages||0),0);
   const foot=$("#list-foot");foot.hidden=!n;
@@ -216,39 +216,64 @@ function renderFiles(){
   if(st.files.some(f=>f.sample))hint=t("Examples shown. Add your own files to replace them.");
   else if(tool.editor&&n>1)hint=t("Tap a file to adjust its crop");
   else if(tool.reorder&&n>1)hint=t("Drag rows to change the order");
-  foot.innerHTML=n?"<span>"+esc(filesN(n))+" · "+fmt(total)+(tool.accept==="pdf"&&pg?" · "+esc(pages(pg)):"")+"</span>"+(hint?"<span>"+esc(hint)+"</span>":""):"";
+  foot.innerHTML=n?"<span>"+esc(filesN(n))+", "+fmt(total)+(tool.accept==="pdf"&&pg?", "+esc(pages(pg)):"")+"</span>"+(hint?"<span>"+esc(hint)+"</span>":""):"";
 }
 function updateRun(){
   const tool=TOOLS[st.tool];const ok=st.files.filter(f=>!f.bad&&(f.kind!=="image"||f.img||f.sample||!tool.editor)).length;
   const b=$("#run");b.textContent=t(tool.btn)+(ok>1&&!["img2pdf","merge"].includes(st.tool)?" ("+ok+")":"");
   b.disabled=st.busy||ok<tool.min;
   if(st.tool==="merge"&&ok<2&&!st.busy)b.textContent=t("Add at least 2 PDFs");
+  const m=$("#mrun");m.textContent=st.busy?t("Working…"):b.textContent;m.disabled=b.disabled;
+  $("#run-hint").hidden=st.files.length>0;
+  syncMbar();
 }
+let runVisible=true;
+function syncMbar(){$("#mbar").hidden=!(st.files.length&&!st.results&&!runVisible);}
+if("IntersectionObserver" in window)new IntersectionObserver(es=>{runVisible=es[0].isIntersecting;syncMbar();}).observe($("#run"));
+$("#mrun").addEventListener("click",()=>{run();});
+const OUT_TOOLS={pdf:["pdfcompress","merge","pdf2img","enhance"],image:["compress","resize","crop","img2pdf","convert","exam"]};
 function renderResults(){
-  const r=st.results;const sec=$("#results");sec.hidden=!r;if(!r)return;
+  const r=st.results;const sec=$("#results");sec.hidden=!r;$("#chain").hidden=!r;if(!r)return;
   const before=r.items.reduce((a,x)=>a+(x.before||0),0),after=r.items.reduce((a,x)=>a+x.blob.size,0);
-  let sum="";
+  let line;
   if(r.compare&&before){
     const pct=Math.round((1-after/before)*100);
-    sum='<div class="sz">'+fmt(before)+'<span class="arrow">→</span>'+fmt(after)+'</div><div class="sub">'+
-      (pct>0?'<span class="pct">'+esc(t("{n}% smaller",{n:pct}))+'</span>':pct<0?'<span class="pct" style="color:var(--stamp)">'+esc(t("{n}% larger",{n:-pct}))+'</span>':esc(t("Same size")))+' · '+esc(r.label)+'</div>';
-  }else sum='<div class="sz">'+fmt(after)+'</div><div class="sub">'+esc(r.label)+'</div>';
-  $("#summary").innerHTML=sum;
-  $("#res-list").innerHTML=r.items.map((it,i)=>{
+    line='<div class="sz">'+fmt(before)+'<span class="arrow">→</span>'+fmt(after)+'</div><div class="sub">'+
+      (pct>0?'<span class="pct">'+esc(t("{n}% smaller",{n:pct}))+'</span>, ':pct<0?esc(t("{n}% larger",{n:-pct}))+', ':'')+esc(r.label)+'</div>';
+  }else line='<div class="sz">'+fmt(after)+'</div><div class="sub">'+esc(r.label)+'</div>';
+  const formTool=["exam","compress","crop","bgremove"].includes(st.tool);
+  $("#summary").innerHTML='<div>'+line+'</div><div class="stamp" aria-hidden="true"><b>'+esc(t(formTool?"Form ready":"Ready"))+'</b><small>'+esc(filesN(r.items.length))+'</small></div>';
+  $("#res-list").innerHTML=r.items.length>1||r.items[0].note||r.items[0].preview?r.items.map((it,i)=>{
     let s=fmt(it.blob.size);
     if(it.before){const d=Math.round((1-it.blob.size/it.before)*100);s=fmt(it.before)+" → "+fmt(it.blob.size)+(d>0?' <span class="down">−'+d+'%</span>':d<0?' <span class="up">+'+(-d)+'%</span>':'');}
-    if(it.dims)s+=" · "+esc(it.dims);
+    if(it.dims)s+=", "+esc(it.dims);
     return '<li><div style="min-width:0;display:flex;gap:12px;align-items:center">'+(it.preview?'<div class="pv"><img alt="" src="'+it.preview+'"></div>':'')+'<div style="min-width:0"><div class="rn">'+esc(it.name)+'</div><div class="rs">'+s+'</div></div></div>'+
-      '<button type="button" class="btn" data-save="'+i+'">'+esc(t("Save"))+'</button>'+(it.note?'<div class="note">'+esc(it.note)+'</div>':'')+'</li>';
-  }).join("");
-  $("#res-foot").innerHTML=(r.items.length>1?'<button type="button" class="btn primary" id="zip-btn">'+esc(t("Save all as ZIP"))+'</button>':'<button type="button" class="btn primary" data-save="0">'+esc(t("Save {name}",{name:r.items[0].name}))+'</button>')+
-    '<button type="button" class="btn" id="again">'+esc(t("Start over"))+'</button>';
+      (r.items.length>1?'<button type="button" class="btn" data-save="'+i+'">'+esc(t("Download"))+'</button>':'<span></span>')+(it.note?'<div class="note">'+esc(it.note)+'</div>':'')+'</li>';
+  }).join(""):"";
+  $("#res-foot").innerHTML=(r.items.length>1?'<button type="button" class="btn primary big wide" id="zip-btn">'+esc(t("Download all (ZIP)"))+'</button>':'<button type="button" class="btn primary big wide" data-save="0">'+esc(t("Download {name}",{name:r.items[0].name}))+'</button>')+
+    '<button type="button" class="btn quiet" id="again">'+esc(t("Start over with new files"))+'</button>';
+  const kind=r.items.every(it=>/pdf$/i.test(it.name))?"pdf":r.items.every(it=>/\.(jpe?g|png|webp)$/i.test(it.name))?"image":null;
+  const next=kind?OUT_TOOLS[kind].filter(k=>k!==st.tool&&(TOOLS[k].min<=r.items.length)):[];
+  $("#chain").hidden=!next.length;
+  $("#chain").innerHTML='<p>'+esc(t(r.items.length>1?"Do more with these files":"Do more with this file"))+'</p><div class="chips">'+next.map(k=>'<button type="button" class="chip" data-chain="'+k+'">'+esc(t(TOOLS[k].name))+'</button>').join("")+'</div>';
+  syncMbar();
+}
+async function continueWith(k){
+  const r=st.results;if(!r||st.busy)return;
+  const files=r.items.map(it=>new File([it.blob],it.name,{type:it.blob.type||(/pdf$/i.test(it.name)?"application/pdf":"image/jpeg")}));
+  st.files=[];st.results=null;st.sel=null;
+  selectTool(k,"click");addFiles(files);
+  $("#work").scrollIntoView({behavior:"smooth",block:"start"});
 }
 function render(){
   const tool=TOOLS[st.tool];
   renderTools();
   $("#lede").innerHTML=t(tool.lede);
-  $("#drop-title").textContent=tool.accept==="any"?t("Drop images or PDFs here"):tool.accept==="pdf"?t("Drop PDF files here"):t("Drop images here");
+  const has=st.files.length>0;$("#work").classList.toggle("has-files",has);
+  $("#drop-title").textContent=has?t("Add more files"):tool.accept==="any"?t("Drop images or PDFs here"):tool.accept==="pdf"?t("Drop PDF files here"):t("Drop images here");
+  $("#pick-label").textContent=has?t("Add files"):t("Choose files");
+  $("#pick-label").classList.toggle("big",!has);$("#pick-label").classList.toggle("primary",!has);
+  $("#try-example").hidden=!accepts(tool,"image");
   $("#picker").accept=tool.accept==="any"?"image/*,.heic,.heif,application/pdf,.pdf":tool.accept==="pdf"?"application/pdf,.pdf":"image/*,.heic,.heif";
   $("#picker").multiple=true;
   if(st.tool==="enhance")syncEnhanceUI();
@@ -677,10 +702,10 @@ const RUN={img2pdf:runImg2Pdf,pdf2img:runPdf2Img,merge:runMerge,pdfcompress:runP
 async function run(){
   if(st.busy)return;const files=st.files.filter(f=>!f.bad);if(files.length<TOOLS[st.tool].min)return;
   st.busy=true;errs=[];showErrors();st.results=null;renderResults();updateRun();
-  try{st.results=await RUN[st.tool](files);toast(st.results.items.length>1?t("Done. Your files are ready to save."):t("Done. Your file is ready to save."));}
+  try{st.results=await RUN[st.tool](files);toast(st.results.items.length>1?t("Done. Your files are ready to download."):t("Done. Your file is ready to download."));}
   catch(e){addErr(e.message||t("Something went wrong while processing."));}
   finally{st.busy=false;progDone();updateRun();renderResults();
-    if(st.results&&window.matchMedia("(max-width:820px)").matches)$("#results").scrollIntoView({behavior:"smooth",block:"start"});}
+    if(st.results)$("#results").scrollIntoView({behavior:"smooth",block:"nearest"});}
 }
 
 /* ---------- settings UI ---------- */
@@ -720,7 +745,6 @@ function selectTool(k,how){
   st.tool=k;st.results=null;errs=[];
   st.files=st.files.filter(f=>accepts(TOOLS[k],f.kind));
   if(TOOLS[k].editor&&!fileById(st.sel))st.sel=st.files.find(x=>x.img)?.id||null;
-  if(!st.files.length&&accepts(TOOLS[k],"image"))loadSamples();
   if(k==="resize")syncResizeDefaults();
   render();
   if(how==="click"){
@@ -728,8 +752,8 @@ function selectTool(k,how){
     document.title=t(TOOLS[k].name)+" – SaralPDF";
   }
 }
-$("#tools").addEventListener("click",e=>{
-  const a=e.target.closest("a[data-tool]");if(!a||e.ctrlKey||e.metaKey||e.shiftKey||e.button)return;
+document.addEventListener("click",e=>{
+  const a=e.target.closest("a.tool[data-tool]");if(!a||e.ctrlKey||e.metaKey||e.shiftKey||e.button)return;
   if(!TOOLS[a.dataset.tool])return;e.preventDefault();selectTool(a.dataset.tool,"click");
 });
 window.addEventListener("popstate",()=>{selectTool(toolFromLocation()||page.tool||"img2pdf","pop");});
@@ -780,6 +804,13 @@ $("#results").addEventListener("click",e=>{
   if(e.target.closest("#zip-btn")){saveZip();return;}
   if(e.target.closest("#again"))startOver();
 });
+$("#chain").addEventListener("click",e=>{const c=e.target.closest("[data-chain]");if(c)continueWith(c.dataset.chain);});
+$("#try-example").addEventListener("click",()=>{loadSamples();});
+/* whole-page drop overlay */
+(function(){let depth=0;const ov=$("#drop-overlay");const isFiles=e=>e.dataTransfer&&[...e.dataTransfer.types].includes("Files");
+  window.addEventListener("dragenter",e=>{if(!isFiles(e))return;depth++;ov.hidden=false;});
+  window.addEventListener("dragleave",e=>{if(!isFiles(e))return;depth=Math.max(0,depth-1);if(!depth)ov.hidden=true;});
+  window.addEventListener("drop",()=>{depth=0;ov.hidden=true;});})();
 const cpq=$("#cp-q");cpq.addEventListener("input",()=>$("#cp-q-out").value=cpq.value);
 document.querySelectorAll('input[name="cp-mode"]').forEach(r=>r.addEventListener("change",()=>{const tg=radio("cp-mode")==="target";$("#cp-t-field").hidden=!tg;$("#cp-q-field").hidden=tg;}));
 function markChips(){const v=+$("#cp-kb").value;document.querySelectorAll("#cp-chips .chip").forEach(c=>c.classList.toggle("on",+c.dataset.kb===v));}
@@ -835,24 +866,6 @@ async function loadSamples(){
     render();
   }catch(e){}finally{sampling=false;}
 }
-
-/* ---------- feedback ---------- */
-const FB_MAIL=["anandd201r","gmail.com"].join("@");
-const fbSub=encodeURIComponent("SaralPDF feedback");
-$("#fb-email").textContent=FB_MAIL;
-$("#fb-gmail").href="https://mail.google.com/mail/?view=cm&fs=1&to="+FB_MAIL+"&su="+fbSub;
-$("#fb-mailto").href="mailto:"+FB_MAIL+"?subject="+fbSub;
-const fbModal=$("#fb-modal");let fbLast=null;
-function openFb(){fbLast=document.activeElement;fbModal.hidden=false;$("#fb-copy").focus();}
-function closeFb(){fbModal.hidden=true;if(fbLast&&fbLast.focus)fbLast.focus();}
-document.addEventListener("click",e=>{const el=e.target.closest("[data-feedback]");if(el){e.preventDefault();openFb();}});
-$("#fb-close").addEventListener("click",closeFb);
-fbModal.addEventListener("click",e=>{if(e.target===fbModal)closeFb();});
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!fbModal.hidden)closeFb();});
-$("#fb-copy").addEventListener("click",async()=>{
-  try{await navigator.clipboard.writeText(FB_MAIL);toast(t("Email address copied"));}
-  catch(_){const r=document.createRange();r.selectNodeContents($("#fb-email"));const s=getSelection();s.removeAllRanges();s.addRange(r);toast(t("Press Ctrl + C to copy"));}
-});
 
 /* ---------- language ---------- */
 function refreshLanguage(){

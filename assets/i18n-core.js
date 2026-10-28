@@ -13,7 +13,7 @@ function t(s,vars){
 }
 /* translate static page text: text nodes whose trimmed text is a dictionary key */
 const orig=new WeakMap();
-const SKIP="script,style,[data-noi18n],#files,#res-list,#summary,#res-foot,#lede,#errors,#toast,#ptxt,#ed-name,.crop-dims,#ex-summary,#ex-note,#drop-title,#run,#pc-help,#en-mode-help,#rs-help,#fb-email,.t-name,#lang-btn,#ex-preset";
+const SKIP="script,style,[data-noi18n],#files,#res-list,#summary,#res-foot,#lede,#errors,#toast,#ptxt,#ed-name,.crop-dims,#ex-summary,#ex-note,#drop-title,#run,#pc-help,#en-mode-help,#rs-help,#fb-email,.wordmark,#lang-btn,#ex-preset,#pick-label,#mrun,#chain,#file-count,#tool-search";
 function walk(root){
   const tw=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode(n){
     const p=n.parentElement;if(!p||p.closest(SKIP))return NodeFilter.FILTER_REJECT;

@@ -17,63 +17,43 @@
 <meta name="theme-color" content="#2445c4">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,750&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap">
-<link rel="stylesheet" href="/assets/app.css?v=3">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,750&family=Hanken+Grotesk:wght@400;500;600;650;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="/assets/app.css?v=4">
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebApplication", "name": "Image to PDF \u2013 SaralPDF", "url": "https://saralpdf.in/image-to-pdf/", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "INR"}, "description": "Convert JPG, PNG and phone photos to one PDF online for free. Reorder pages, choose A4 size and margins. Files never leave your device."}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can I convert photos from my phone?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. SaralPDF works in your phone's browser. Choose photos from your gallery and save the PDF to your phone."}}, {"@type": "Question", "name": "Is there a limit on the number of images?", "acceptedAnswer": {"@type": "Answer", "text": "No fixed limit. Each image can be up to 50 MB."}}]}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://saralpdf.in/"}, {"@type": "ListItem", "position": 2, "name": "Image to PDF", "item": "https://saralpdf.in/image-to-pdf/"}]}]}</script>
 </head>
 <body>
 <div class="wrap">
-  <header class="topbar" id="top">
-    <a class="brand" href="/" aria-label="SaralPDF home">
-      <span class="mark" aria-hidden="true"><span>PDF</span></span>
-      <span class="wordmark">Saral<b>PDF</b></span>
-    </a>
-    <nav class="nav" aria-label="Main">
-      <a href="/#tools-sec" class="nav-hide">Tools</a>
-      <a href="/guides/" class="nav-hide">Guides</a>
-      <button type="button" class="lang-btn" id="lang-btn" lang="hi"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="8" cy="8" r="6.2"/><path d="M1.8 8h12.4M8 1.8c1.8 1.9 2.6 3.9 2.6 6.2S9.8 12.3 8 14.2M8 1.8C6.2 3.7 5.4 5.7 5.4 8s.8 4.3 2.6 6.2"/></svg><span>हिंदी</span></button>
-      <button type="button" class="btn fb" data-feedback>
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2.5 3.5h11v7h-6l-3 2.5v-2.5h-2z"/></svg><span class="nav-hide-sm">Feedback</span></button>
-    </nav>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="SaralPDF home"><span class="mark" aria-hidden="true"><span>PDF</span></span><span class="wordmark">Saral<b>PDF</b></span></a>
+    <button type="button" class="hbtn" id="menu-btn" aria-expanded="false" aria-controls="tools"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="2" y="2" width="5" height="5" rx="1.2"/><rect x="9" y="2" width="5" height="5" rx="1.2"/><rect x="2" y="9" width="5" height="5" rx="1.2"/><rect x="9" y="9" width="5" height="5" rx="1.2"/></svg><span>All tools</span><svg class="chev" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 4.5l3 3 3-3"/></svg></button>
+    <a class="hbtn hide-sm" href="/guides/">Guides</a>
+    <button type="button" class="hbtn outline" id="lang-btn" lang="hi"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="8" cy="8" r="6.2"/><path d="M1.8 8h12.4M8 1.8c1.8 1.9 2.6 3.9 2.6 6.2S9.8 12.3 8 14.2M8 1.8C6.2 3.7 5.4 5.7 5.4 8s.8 4.3 2.6 6.2"/></svg><span>हिंदी</span></button>
+    <button type="button" class="hbtn hide-xs" data-feedback aria-label="Feedback"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2.5 3.5h11v7h-6l-3 2.5v-2.5h-2z"/></svg><span class="hide-sm">Feedback</span></button>
+    <div class="menu" id="tools" hidden><div class="menu-group"><h2>For exam and job forms</h2><ul class="tlist"><li><a class="tool" href="/exam-photo-signature/" data-tool="exam" data-k="exam form photo signature ibps ssc neet upsc sbi bank railway परीक्षा फ़ोटो हस्ताक्षर"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="11" r="2.5"/><path d="M5.5 17c.6-2 2-3 3.5-3s2.9 1 3.5 3M15 9h3M15 12h3M15 15h2"/></svg></span><span class="t-title"><span class="t-name">Exam Photo &amp; Signature</span><span class="t-new">New</span></span><span class="t-desc">Exact size and KB for IBPS, SSC, NEET, UPSC</span></a></li><li><a class="tool" href="/compress-image/" data-tool="compress" data-k="compress reduce photo image kb 20kb 50kb 100kb size small छोटा कम साइज़"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h5V4M20 9h-5V4M4 15h5v5M20 15h-5v5"/></svg></span><span class="t-title"><span class="t-name">Compress Image</span></span><span class="t-desc">Make a photo fit a KB limit like 20 KB or 50 KB</span></a></li><li><a class="tool" href="/crop-image/" data-tool="crop" data-k="crop cut passport square photo trim क्रॉप काटें"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg></span><span class="t-title"><span class="t-name">Crop Image</span><span class="t-new">New</span></span><span class="t-desc">Cut to passport, square or any shape</span></a></li><li><a class="tool" href="/remove-background/" data-tool="bgremove" data-k="background remove white transparent cutout बैकग्राउंड"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M5 21c1-4 3.8-6 7-6s6 2 7 6"/><path d="M3 3h3M3 3v3M21 3h-3M21 3v3M3 21v-3M21 21v-3" /></svg></span><span class="t-title"><span class="t-name">Remove Background</span></span><span class="t-desc">White or transparent background with AI</span></a></li></ul></div><div class="menu-group"><h2>PDF tools</h2><ul class="tlist"><li><a class="tool" href="/image-to-pdf/" data-tool="img2pdf" data-k="jpg png photo image to pdf convert scan इमेज से पीडीएफ"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="11" height="9" rx="1.5"/><path d="M3 11l3-3 3 3 2-2 3 3"/><path d="M15 9h3.5L21 11.5V20a1 1 0 0 1-1 1h-8a1 1 0 0 1-1-1v-4"/></svg></span><span class="t-title"><span class="t-name">Image to PDF</span></span><span class="t-desc">Turn photos and scans into one PDF</span></a></li><li><a class="tool" href="/merge-pdf/" data-tool="merge" data-k="merge combine join pdf certificates जोड़ें"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3h6l4 4v9a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M4 7v12a2 2 0 0 0 2 2h9"/><path d="M10 10h5M10 13h5"/></svg></span><span class="t-title"><span class="t-name">Merge PDF</span></span><span class="t-desc">Join several PDFs in your order</span></a></li><li><a class="tool" href="/compress-pdf/" data-tool="pdfcompress" data-k="compress reduce pdf size mb kb 1mb 500kb 200kb छोटा"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M11.5 8v4m0 0l-2-2m2 2l2-2M11.5 18v-3m0 0l-2 2m2-2l2 2"/></svg></span><span class="t-title"><span class="t-name">Compress PDF</span></span><span class="t-desc">Shrink scans to fit upload limits</span></a></li><li><a class="tool" href="/pdf-to-image/" data-tool="pdf2img" data-k="pdf to jpg png image pages convert"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h7l4 4v4"/><path d="M5 3v14h5"/><rect x="12" y="13" width="9" height="8" rx="1.5"/><path d="M12 19l2.5-2.5 2 2 1.5-1.5 3 3"/></svg></span><span class="t-title"><span class="t-name">PDF to Image</span></span><span class="t-desc">Save pages as JPG or PNG</span></a></li></ul></div><div class="menu-group"><h2>Image tools</h2><ul class="tlist"><li><a class="tool" href="/resize-image/" data-tool="resize" data-k="resize pixels px width height dimensions cm साइज़ बदलें"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg></span><span class="t-title"><span class="t-name">Resize Image</span></span><span class="t-desc">Set exact width and height in pixels</span></a></li><li><a class="tool" href="/convert-image/" data-tool="convert" data-k="convert heic iphone jpg png webp format फ़ॉर्मेट"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg></span><span class="t-title"><span class="t-name">Convert Image</span><span class="t-new">New</span></span><span class="t-desc">HEIC to JPG, PNG and WebP</span></a></li><li><a class="tool" href="/enhance/" data-tool="enhance" data-k="enhance quality clear sharp scan shadow document सुधारें साफ़"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19L15 9"/><path d="M14 4l.8 2.2L17 7l-2.2.8L14 10l-.8-2.2L11 7l2.2-.8zM19 11l.5 1.5L21 13l-1.5.5L19 15l-.5-1.5L17 13l1.5-.5z"/></svg></span><span class="t-title"><span class="t-name">Enhance Quality</span></span><span class="t-desc">Clean up dark, shadowy scans and photos</span></a></li></ul></div></div>
   </header>
 
   <section class="tool-hero">
     <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><span>Image to PDF</span></nav>
     <h1>Convert images to PDF</h1>
-    <div class="privacy" style="align-self:flex-start">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg>
-      <span>100% private · Files never leave your device</span>
-    </div>
+    <p class="lede" id="lede"></p>
+    <span class="privacy-line"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg><span>Files never leave your device</span></span>
   </section>
 
-  <nav class="tools-scroll" id="tools-sec" aria-label="Tools"><div class="tools" id="tools">
-    <a class="tool" href="/image-to-pdf/" data-tool="img2pdf"><span class="t-name">Image to PDF</span><span class="t-hint">JPG → PDF</span></a>
-    <a class="tool" href="/merge-pdf/" data-tool="merge"><span class="t-name">Merge PDF</span><span class="t-hint">PDF + PDF</span></a>
-    <a class="tool" href="/compress-pdf/" data-tool="pdfcompress"><span class="t-name">Compress PDF</span><span class="t-hint">PDF → KB</span></a>
-    <a class="tool" href="/pdf-to-image/" data-tool="pdf2img"><span class="t-name">PDF to Image</span><span class="t-hint">PDF → JPG</span></a>
-    <a class="tool" href="/compress-image/" data-tool="compress"><span class="t-name">Compress Image</span><span class="t-hint">MB → KB</span></a>
-    <a class="tool" href="/resize-image/" data-tool="resize"><span class="t-name">Resize Image</span><span class="t-hint">W × H</span></a>
-    <a class="tool" href="/crop-image/" data-tool="crop"><span><span class="t-name">Crop Image</span><span class="t-new">New</span></span><span class="t-hint">✂ RATIO</span></a>
-    <a class="tool" href="/exam-photo-signature/" data-tool="exam"><span><span class="t-name">Exam Photo &amp; Signature</span><span class="t-new">New</span></span><span class="t-hint">SSC · IBPS · NEET</span></a>
-    <a class="tool" href="/convert-image/" data-tool="convert"><span><span class="t-name">Convert Image</span><span class="t-new">New</span></span><span class="t-hint">HEIC · JPG · PNG</span></a>
-    <a class="tool" href="/enhance/" data-tool="enhance"><span class="t-name">Enhance Quality</span><span class="t-hint">IMG · PDF</span></a>
-    <a class="tool" href="/remove-background/" data-tool="bgremove"><span class="t-name">Remove Background</span><span class="t-hint">AI · PNG</span></a>
-  </div></nav>
-  <p class="lede" id="lede"></p>
-
-  <div class="bench">
+  <div class="work" id="work">
     <div class="col">
       <div class="drop" id="drop">
-        <svg class="drop-ico" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 26v6h20v-6"/><path d="M20 8v17M13 15l7-7 7 7"/></svg>
+        <span class="drop-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg></span>
         <p class="big" id="drop-title">Drop images here</p>
-        <p class="small" id="drop-sub">or</p>
-        <label class="btn primary" for="picker">Choose files</label>
+        <div class="drop-actions">
+          <label class="btn primary big" for="picker" id="pick-label">Choose files</label>
+          <button type="button" class="btn link" id="try-example">Try with an example</button>
+        </div>
+        <p class="small">Up to 50 MB per file. iPhone HEIC photos work too. You can also paste a screenshot with <span class="kbd">Ctrl</span> + <span class="kbd">V</span>.</p>
         <input type="file" id="picker" multiple class="sr">
-        <p class="small">Up to 50 MB per file · iPhone HEIC photos work too · paste a screenshot with <span class="kbd">Ctrl</span> + <span class="kbd">V</span></p>
       </div>
 
       <section class="panel editor-panel" id="editor-panel" hidden aria-labelledby="ed-h">
-        <div class="panel-h"><h2 id="ed-h">Adjust crop</h2><span class="finfo" id="ed-name"></span></div>
+        <div class="panel-h"><h2 id="ed-h">Adjust crop</h2><span class="ed-name" id="ed-name"></span></div>
         <div class="panel-b">
           <div class="stage-wrap"><div class="stage" id="stage">
             <div class="crop-clip"><div class="crop-box" id="crop-box"></div></div>
@@ -83,28 +63,27 @@
             <button type="button" class="btn" data-ed="left">⟲ <span>Rotate left</span></button>
             <button type="button" class="btn" data-ed="right">⟳ <span>Rotate right</span></button>
             <button type="button" class="btn" data-ed="flip">⇋ <span>Flip</span></button>
-            <button type="button" class="btn" data-ed="reset"><span>Reset</span></button>
+            <button type="button" class="btn quiet" data-ed="reset"><span>Reset</span></button>
           </div>
-          <p class="help" style="margin:0">Drag the box to move it. Drag a corner to resize.</p>
+          <p class="help">Drag the box to move it. Drag a corner to resize.</p>
         </div>
       </section>
 
-      <section class="panel" aria-labelledby="files-h">
+      <section class="panel files-panel" aria-labelledby="files-h">
         <div class="panel-h">
-          <h2 id="files-h">Files <span id="file-count"></span></h2>
-          <button class="btn ghost" id="clear" type="button">Start over</button>
+          <h2 id="files-h">Your files <span id="file-count"></span></h2>
+          <button class="btn quiet" id="clear" type="button">Start over</button>
         </div>
         <ul class="files" id="files"></ul>
-        <div class="empty" id="files-empty" hidden>No files yet. Add some above.</div>
+        <div class="empty" id="files-empty" hidden></div>
         <div class="list-foot" id="list-foot"></div>
       </section>
     </div>
 
     <div class="col">
-      <section class="panel" aria-labelledby="set-h">
+      <section class="panel settings" aria-labelledby="set-h">
         <div class="panel-h"><h2 id="set-h">Settings</h2></div>
         <div class="panel-b">
-
           <div data-for="img2pdf">
             <div class="panel-b" style="padding:0">
               <div class="field"><label for="i2p-size">Page size</label>
@@ -332,40 +311,37 @@
             </div>
           </div>
 
+
           <div class="notice err" id="errors" hidden role="alert"></div>
           <div class="progress" id="progress" hidden><div class="bar"><i id="bar"></i></div><div class="ptxt" id="ptxt"></div></div>
-          <button class="btn primary big" id="run" type="button">Create PDF</button>
+          <button class="btn primary big wide" id="run" type="button">Create PDF</button>
+          <p class="run-hint" id="run-hint">Add a file to start.</p>
         </div>
       </section>
 
-      <section class="panel" id="results" hidden aria-labelledby="res-h">
+      <section class="panel result" id="results" hidden aria-labelledby="res-h">
         <h2 class="sr" id="res-h">Results</h2>
-        <div class="summary" id="summary"></div>
+        <div class="result-head" id="summary"></div>
         <ul class="res" id="res-list"></ul>
         <div class="res-foot" id="res-foot"></div>
+        <div class="chain" id="chain" hidden></div>
       </section>
     </div>
   </div>
+  <div class="mbar" id="mbar" hidden><button class="btn primary big wide" id="mrun" type="button">Create PDF</button></div>
+  <div class="drop-overlay" id="drop-overlay" hidden><div>Drop files to add them</div></div>
 
   <section class="tool-info" data-tool-content="img2pdf">
-    <div class="ti-card"><h2>How to use it</h2><ol><li>Add your photos or scans (JPG, PNG, WebP or iPhone HEIC).</li><li>Drag them into the right page order.</li><li>Choose the page size, orientation and margin.</li><li>Tap Create PDF and save your file.</li></ol><p style="margin-top:12px">Step-by-step guide: <a href="/guides/phone-photos-to-pdf/">How to turn phone photos of documents into a clean PDF</a></p></div>
-    <div class="ti-card"><h2>Questions</h2><h3>Can I convert photos from my phone?</h3><p>Yes. SaralPDF works in your phone&#x27;s browser. Choose photos from your gallery and save the PDF to your phone.</p><h3>Is there a limit on the number of images?</h3><p>No fixed limit. Each image can be up to 50 MB.</p></div>
+    <div><h2>How to use it</h2><ol><li>Add your photos or scans (JPG, PNG, WebP or iPhone HEIC).</li><li>Drag them into the right page order.</li><li>Choose the page size, orientation and margin.</li><li>Tap Create PDF and save your file.</li></ol><p class="guide-link">Step-by-step guide: <a href="/guides/phone-photos-to-pdf/" data-noi18n>How to turn phone photos of documents into a clean PDF</a></p></div>
+    <div><h2>Questions</h2><h3>Can I convert photos from my phone?</h3><p>Yes. SaralPDF works in your phone&#x27;s browser. Choose photos from your gallery and save the PDF to your phone.</p><h3>Is there a limit on the number of images?</h3><p>No fixed limit. Each image can be up to 50 MB.</p></div>
   </section>
 
-  <section class="guides" aria-labelledby="guides-h">
-    <div class="guides-head"><h2 id="guides-h">Step-by-step guides</h2><a href="/guides/">All guides →</a></div>
-    <div class="g-grid" data-noi18n>
-      <a class="g-card" href="/guides/compress-photo-to-20kb-50kb/"><span class="g-k">Exam &amp; job forms</span><span class="g-t">How to compress a photo to 20 KB or 50 KB for online forms</span></a>
-      <a class="g-card" href="/guides/photo-signature-size-cm-to-pixels/"><span class="g-k">Exam &amp; job forms</span><span class="g-t">Photo and signature size: converting cm to pixels</span></a>
-      <a class="g-card" href="/guides/merge-pdf-files/"><span class="g-k">PDF</span><span class="g-t">How to merge PDF files into one</span></a>
-      <a class="g-card" href="/guides/phone-photos-to-pdf/"><span class="g-k">PDF</span><span class="g-t">How to turn phone photos of documents into a clean PDF</span></a>
-      <a class="g-card" href="/guides/reduce-pdf-size/"><span class="g-k">PDF</span><span class="g-t">How to reduce PDF size for upload</span></a>
-      <a class="g-card" href="/guides/white-background-photo/"><span class="g-k">Photos</span><span class="g-t">How to make a photo background white</span></a>
-    </div>
+  <section class="related" data-tool-content="img2pdf" aria-labelledby="rel-h-img2pdf">
+    <h2 id="rel-h-img2pdf">Related tools</h2>
+    <ul class="tlist"><li><a class="tool" href="/compress-pdf/" data-tool="pdfcompress" data-k="compress reduce pdf size mb kb 1mb 500kb 200kb छोटा"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M11.5 8v4m0 0l-2-2m2 2l2-2M11.5 18v-3m0 0l-2 2m2-2l2 2"/></svg></span><span class="t-title"><span class="t-name">Compress PDF</span></span><span class="t-desc">Shrink scans to fit upload limits</span></a></li><li><a class="tool" href="/merge-pdf/" data-tool="merge" data-k="merge combine join pdf certificates जोड़ें"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3h6l4 4v9a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M4 7v12a2 2 0 0 0 2 2h9"/><path d="M10 10h5M10 13h5"/></svg></span><span class="t-title"><span class="t-name">Merge PDF</span></span><span class="t-desc">Join several PDFs in your order</span></a></li><li><a class="tool" href="/enhance/" data-tool="enhance" data-k="enhance quality clear sharp scan shadow document सुधारें साफ़"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19L15 9"/><path d="M14 4l.8 2.2L17 7l-2.2.8L14 10l-.8-2.2L11 7l2.2-.8zM19 11l.5 1.5L21 13l-1.5.5L19 15l-.5-1.5L17 13l1.5-.5z"/></svg></span><span class="t-title"><span class="t-name">Enhance Quality</span></span><span class="t-desc">Clean up dark, shadowy scans and photos</span></a></li><li><a class="tool" href="/compress-image/" data-tool="compress" data-k="compress reduce photo image kb 20kb 50kb 100kb size small छोटा कम साइज़"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h5V4M20 9h-5V4M4 15h5v5M20 15h-5v5"/></svg></span><span class="t-title"><span class="t-name">Compress Image</span></span><span class="t-desc">Make a photo fit a KB limit like 20 KB or 50 KB</span></a></li></ul>
   </section>
-
   <footer>
-    <span>© 2026 SaralPDF · Made in India</span>
+    <span>© 2026 SaralPDF. Made in India.</span>
     <span class="foot-links"><a href="/guides/">Guides</a><a href="/about/">About</a><a href="/privacy/">Privacy Policy</a><a href="/terms/">Terms</a><a href="/contact/">Contact</a></span>
   </footer>
 </div>
@@ -382,12 +358,13 @@
   </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
-<script src="/assets/hi.js?v=3"></script>
-<script src="/assets/i18n-core.js?v=3"></script>
+<script src="/assets/hi.js?v=4"></script>
+<script src="/assets/i18n-core.js?v=4"></script>
+<script src="/assets/ui.js?v=4"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>window.SARAL_PAGE={tool:"img2pdf"};</script>
-<script src="/assets/app.js?v=3"></script>
+<script src="/assets/app.js?v=4"></script>
 </body>
 </html>

@@ -58,7 +58,7 @@ flowchart LR
 
 ```
 SaralPDF/
-├── index.html                  Home page (all tools)
+├── index.html                  Home page: searchable tool directory
 ├── image-to-pdf/index.html     ┐
 ├── merge-pdf/index.html        │
 ├── compress-pdf/index.html     │
@@ -74,6 +74,7 @@ SaralPDF/
 │   ├── app.js          The application (all tools)
 │   ├── app.css         Styles for tool pages
 │   ├── i18n-core.js    Language switch engine
+│   ├── ui.js           Tools menu, home search, feedback dialog
 │   ├── hi.js           Hindi translations
 │   └── site.css        Styles for content pages
 ├── guides/             Six how-to articles + index
@@ -114,11 +115,12 @@ Script load order on each page:
 
 1. `hi.js` defines the Hindi dictionary.
 2. `i18n-core.js` exposes `SaralI18n.t()` and the language button.
-3. pdf-lib, JSZip, PDF.js from cdnjs.
-4. `window.SARAL_PAGE = {tool: "..."}` (tool pages only).
-5. `app.js` starts the app.
+3. `ui.js` wires the tools menu, the home search and the feedback dialog.
+4. On tool pages only: pdf-lib, JSZip and PDF.js from cdnjs, then `window.SARAL_PAGE = {tool: "..."}`, then `app.js`.
 
-**Switching tools without reloading.** Tool tiles are real links (`<a href="/merge-pdf/">`), so they work without JavaScript and search engines can follow them. When JavaScript is running, a click is intercepted: the app switches tool in place, keeps compatible files, and updates the address bar with `history.pushState`. The browser Back button is handled through `popstate`.
+The home page is a lightweight tool directory with search (English and Hindi keywords) and loads no PDF libraries at all.
+
+**Switching tools without reloading.** Tool links in the header menu and the Related tools list are real links (`<a href="/merge-pdf/">`), so they work without JavaScript and search engines can follow them. When JavaScript is running, a click is intercepted: the app switches tool in place, keeps compatible files, and updates the address bar with `history.pushState`. The browser Back button is handled through `popstate`.
 
 ---
 
@@ -177,6 +179,22 @@ Each tool is one entry in `TOOLS` (name, accepted file kind, button text, minimu
 | `convert` | images | `runConvert` | image per input |
 | `enhance` | images + PDFs | `runEnhance` | image or PDF per input |
 | `bgremove` | images | `runBgRemove` | PNG/JPG per input |
+
+### User flow
+
+```mermaid
+flowchart LR
+    E["Empty state<br/>large drop area,<br/>Try with an example"] --> F["Files added<br/>drop area shrinks to<br/>Add more files"]
+    F --> S["Settings + main button<br/>(fixed bottom bar on phones)"]
+    S --> R["Result card<br/>stamp, big Download"]
+    R -- "Do more with this file" --> F2["Next tool,<br/>same file, no re-upload"]
+    R -- "Start over" --> E
+```
+
+- Example files load only when the user asks for them.
+- On phones a bottom action bar appears when the main button is scrolled out of view (IntersectionObserver).
+- Dragging files anywhere over the page shows a full-page drop target.
+- **Tool chaining:** result blobs are turned back into `File` objects and handed to the next tool, so a user can make a PDF and compress it without downloading and re-uploading.
 
 ### Error handling
 
