@@ -1045,7 +1045,9 @@ function refreshLanguage(){
 I.onChange(refreshLanguage);
 
 /* ---------- start ---------- */
-buildPresetSelect();syncPreset(true);syncPcHelp();syncRsHelp();
+buildPresetSelect();
+{const pre=new URLSearchParams(location.search).get("preset");if(pre&&PRESETS.some(p=>p.id===pre))$("#ex-preset").value=pre;}
+syncPreset(true);syncPcHelp();syncRsHelp();
 const start=toolFromLocation()||page.tool||"img2pdf";
 st.tool=start;
 syncPcMode();applyTargetKb(start,+new URLSearchParams(location.search).get("kb")||page.kb);
