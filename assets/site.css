@@ -114,3 +114,7 @@ footer{color:var(--muted);font-size:13.5px;display:flex;flex-wrap:wrap;justify-c
 .nav a.nav-tools{display:inline-flex;align-items:center;gap:7px}
 .nav a.nav-tools svg{width:14px;height:14px}
 @media (max-width:560px){.nav a.nav-hide{display:none}}
+.foot-links{align-items:center}
+.foot-links a.tfj-link{display:inline-flex;align-items:center;gap:6px;color:#fff;background:#17946a;font-weight:700;padding:6px 12px;border-radius:999px;text-decoration:none}
+.foot-links a.tfj-link:hover{background:#127a57;color:#fff}
+.tfj-link svg{width:15px;height:15px}

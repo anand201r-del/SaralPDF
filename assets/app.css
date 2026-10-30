@@ -328,7 +328,7 @@ a.chip{text-decoration:none}
 
 /* footer */
 footer{color:var(--muted);font-size:13.5px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;border-top:1px solid var(--line);padding-top:16px}
-.foot-links{display:flex;flex-wrap:wrap;gap:6px 18px}
+.foot-links{display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px}
 .foot-links a{color:var(--muted);text-decoration:none}
 .foot-links a:hover{color:var(--pen)}
 
@@ -361,10 +361,16 @@ footer{color:var(--muted);font-size:13.5px;display:flex;flex-wrap:wrap;justify-c
 .fit.ok{background:var(--good-soft,#e3f5ea);color:var(--good)}
 .fit.no{background:var(--bad-soft);color:var(--bad)}
 
-/* ---------- sister site banner ---------- */
-.promo{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:16px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px 20px;box-shadow:var(--shadow-1)}
-.promo-ico{width:44px;height:44px;border-radius:12px;background:var(--pen-soft);color:var(--pen);display:flex;align-items:center;justify-content:center}
-.promo-ico svg{width:24px;height:24px}
-.promo h2{margin:0;font:750 19px/1.2 var(--f-display);letter-spacing:-.015em}
-.promo p{margin:3px 0 0;font-size:14px;color:var(--muted)}
-@media (max-width:620px){.promo{grid-template-columns:auto minmax(0,1fr)}.promo .btn{grid-column:1/-1;width:100%}}
+/* ---------- TechFresher Jobs (sister site) ---------- */
+.promo{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px 28px;align-items:center;background:linear-gradient(135deg,#0b1a33,#12284a);color:#fff;border-radius:var(--r-lg);padding:24px 28px;box-shadow:var(--shadow-1)}
+.promo-brand{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:#cfe3ff}
+.promo-ico{width:30px;height:30px;border-radius:8px;background:#17946a;color:#fff;display:flex;align-items:center;justify-content:center}
+.promo-ico svg{width:17px;height:17px}
+.promo h2{margin:10px 0 0;font:750 24px/1.15 var(--f-display);letter-spacing:-.02em;color:#fff}
+.promo p{margin:6px 0 0;font-size:14.5px;color:#b9c6dc;max-width:60ch}
+.promo-btn{display:inline-flex;align-items:center;gap:8px;background:#17946a;color:#fff;font-weight:700;font-size:15px;text-decoration:none;padding:13px 22px;border-radius:12px;white-space:nowrap}
+.promo-btn:hover{background:#127a57}
+@media (max-width:620px){.promo{grid-template-columns:minmax(0,1fr);padding:20px}.promo-btn{justify-content:center}}
+.foot-links a.tfj-link,.tfj-link{display:inline-flex;align-items:center;gap:6px;color:#fff;background:#17946a;font-weight:700;padding:6px 12px;border-radius:999px;text-decoration:none}
+.foot-links a.tfj-link:hover{background:#127a57;color:#fff}
+.tfj-link svg{width:15px;height:15px}
