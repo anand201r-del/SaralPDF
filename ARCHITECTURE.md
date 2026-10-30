@@ -77,6 +77,7 @@ SaralPDF/
 │   ├── ui.js           Tools menu, home search, feedback dialog
 │   ├── hi.js           Hindi translations
 │   └── site.css        Styles for content pages
+├── compress-pdf-to-300kb/ ...   Target-size landing pages (11), made by tools/gen_size_pages.py
 ├── guides/             Six how-to articles + index
 ├── about/  privacy/  terms/  contact/
 ├── sitemap.xml  robots.txt  site.webmanifest
@@ -269,6 +270,21 @@ repeat 7 times:
 
 Seven steps narrow quality to within about 1%. If even the lowest quality is too big, the image is scaled down by 20% and the search repeats (up to 10 rounds). For exam files the pixel size is fixed, so only quality changes.
 
+### Compress a PDF to a target size
+
+Compress PDF (Target size) and Image to PDF (Max PDF size) share `fitPdf()`:
+
+1. Each page is rendered once at 150 DPI (or each image capped at 2400 px) and kept as a high-quality JPEG.
+2. `jpegsUnder()` walks down a ladder of scales (100%, 80%, 66% … 15%). At each scale it first checks quality 0.35; if the pages still don't fit, it moves to the next scale. Otherwise it binary-searches quality between 0.35 and 0.92. Quality is preferred over resolution, so text stays readable.
+3. The PDF is built with pdf-lib. If PDF structure pushes it over the limit, the budget is lowered by the excess and the search runs again.
+4. A PDF that is already under the target is returned unchanged.
+
+Landing pages such as `/compress-pdf-to-300kb/` are normal tool pages with `SARAL_PAGE.kb` set; `?kb=300` in the URL does the same on any compress page.
+
+### Resize in cm, mm or inches
+
+Physical sizes are converted with the chosen DPI (`px = cm / 2.54 × DPI`), and the DPI is written into the JPEG JFIF header so the file reports the right print size.
+
 ### Reaching a minimum KB (exam forms)
 
 Some forms reject files that are too small (for example under 20 KB). Very simple images can encode smaller than that even at the highest quality. The app inserts JPEG **comment segments** (marker `FF FE`) right after the start-of-image marker. Image viewers ignore comments, so the picture is unchanged but the file reaches the required size.
@@ -351,7 +367,7 @@ flowchart LR
 
 - One page per tool with a unique `<title>`, meta description, H1, how-to steps and FAQ.
 - Structured data (JSON-LD): `WebApplication`, `FAQPage` and `BreadcrumbList` on tool pages; `Article` on guides.
-- `sitemap.xml` lists all 23 pages; `robots.txt` points to it. The site is verified in Google Search Console.
+- `sitemap.xml` lists all 34 pages; `robots.txt` points to it. The site is verified in Google Search Console.
 - Canonical URLs, Open Graph tags, favicon and web app manifest on every page.
 - Guides link to the matching tool pages, and tool pages link back to guides.
 
