@@ -111,3 +111,6 @@ footer{color:var(--muted);font-size:13.5px;display:flex;flex-wrap:wrap;justify-c
 .foot-links a{color:var(--muted);text-decoration:none}
 .foot-links a:hover{color:var(--accent)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+.nav a.nav-tools{display:inline-flex;align-items:center;gap:7px}
+.nav a.nav-tools svg{width:14px;height:14px}
+@media (max-width:560px){.nav a.nav-hide{display:none}}
