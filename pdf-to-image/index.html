@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,750&family=Hanken+Grotesk:wght@400;500;600;650;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap">
-<link rel="stylesheet" href="/assets/app.css?v=5">
+<link rel="stylesheet" href="/assets/app.css?v=6">
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebApplication", "name": "PDF to Image \u2013 SaralPDF", "url": "https://saralpdf.in/pdf-to-image/", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "INR"}, "description": "Convert PDF pages to JPG or PNG images at 72, 150 or 300 DPI. Choose page ranges and download all pages as a ZIP. Free and private."}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Which resolution should I choose?", "acceptedAnswer": {"@type": "Answer", "text": "150 DPI suits screens and most uploads. Use 300 DPI for printing."}}, {"@type": "Question", "name": "Can I convert only some pages?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Type page numbers or ranges like 2-4, 7 in the Pages box."}}]}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://saralpdf.in/"}, {"@type": "ListItem", "position": 2, "name": "PDF to Image", "item": "https://saralpdf.in/pdf-to-image/"}]}]}</script>
 </head>
 <body>
@@ -48,7 +48,8 @@
           <label class="btn primary big" for="picker" id="pick-label">Choose files</label>
           <button type="button" class="btn link" id="try-example">Try with an example</button>
         </div>
-        <p class="small">Up to 50 MB per file. iPhone HEIC photos work too. You can also paste a screenshot with <span class="kbd">Ctrl</span> + <span class="kbd">V</span>.</p>
+        <p class="small img-only">Up to 50 MB per file. iPhone HEIC photos work too. You can also paste a screenshot with <span class="kbd">Ctrl</span> + <span class="kbd">V</span>.</p>
+        <p class="small pdf-only" hidden>Up to 50 MB per file. Password-protected PDFs need the password removed first.</p>
         <input type="file" id="picker" multiple class="sr">
       </div>
 
@@ -106,8 +107,8 @@
                   <label><input type="radio" name="i2p-margin" id="i2p-m-2" value="40"><span>Large</span></label>
                 </div></div>
               <div class="field"><label for="i2p-kb">Max PDF size <span class="opt">(optional)</span></label>
-                <div class="with-suffix"><input type="number" id="i2p-kb" min="0" step="any" placeholder="No limit"><select class="sfx-sel" id="i2p-unit" aria-label="Unit"><option value="kb">KB</option><option value="mb">MB</option></select></div>
-                <div class="chips" id="i2p-chips">
+                <div class="with-suffix"><input type="number" class="big-num" inputmode="decimal" id="i2p-kb" min="0" step="any" placeholder="No limit"><select class="sfx-sel" id="i2p-unit" aria-label="Unit"><option value="kb">KB</option><option value="mb">MB</option></select></div>
+                <div class="chips size-chips" id="i2p-chips">
                   <button type="button" class="chip" data-kb="100">100 KB</button>
                   <button type="button" class="chip" data-kb="200">200 KB</button>
                   <button type="button" class="chip" data-kb="300">300 KB</button>
@@ -115,6 +116,7 @@
                   <button type="button" class="chip" data-kb="1024">1 MB</button>
                   <button type="button" class="chip" data-kb="2048">2 MB</button>
                 </div>
+                <p class="size-est" id="i2p-est" hidden></p>
                 <p class="help">Leave empty for the best quality. With a limit, images are compressed until the PDF fits.</p></div>
               <div class="field"><label for="i2p-name">File name</label>
                 <div class="with-suffix"><input type="text" id="i2p-name" value="saralpdf-document"><span class="sfx">.pdf</span></div></div>
@@ -156,8 +158,8 @@
                   <label><input type="radio" name="pc-mode" id="pc-m-level" value="level"><span>Level</span></label>
                 </div></div>
               <div class="field" id="pc-t-field"><label for="pc-kb">Keep each PDF under</label>
-                <div class="with-suffix"><input type="number" id="pc-kb" min="1" step="any" value="300"><select class="sfx-sel" id="pc-unit" aria-label="Unit"><option value="kb">KB</option><option value="mb">MB</option></select></div>
-                <div class="chips" id="pc-chips">
+                <div class="with-suffix"><input type="number" class="big-num" inputmode="decimal" id="pc-kb" min="1" step="any" value="300"><select class="sfx-sel" id="pc-unit" aria-label="Unit"><option value="kb">KB</option><option value="mb">MB</option></select></div>
+                <div class="chips size-chips" id="pc-chips">
                   <button type="button" class="chip" data-kb="100">100 KB</button>
                   <button type="button" class="chip" data-kb="200">200 KB</button>
                   <button type="button" class="chip" data-kb="300">300 KB</button>
@@ -165,6 +167,7 @@
                   <button type="button" class="chip" data-kb="1024">1 MB</button>
                   <button type="button" class="chip" data-kb="2048">2 MB</button>
                 </div>
+                <p class="size-est" id="pc-est" hidden></p>
                 <p class="help">SaralPDF finds the best quality that still fits under this size.</p></div>
               <div class="field" id="pc-level-field" hidden><span class="lbl" id="pc-level-l">Compression</span>
                 <div class="seg" role="radiogroup" aria-labelledby="pc-level-l">
@@ -189,8 +192,8 @@
                 <div class="range-row"><input type="range" id="cp-q" min="10" max="95" value="70"><output id="cp-q-out" for="cp-q">70</output></div>
                 <p class="help">70 is a good balance. Lower means smaller files.</p></div>
               <div class="field" id="cp-t-field" hidden><label for="cp-kb">Keep each image under</label>
-                <div class="with-suffix"><input type="number" id="cp-kb" min="1" step="any" value="100"><select class="sfx-sel" id="cp-unit" aria-label="Unit"><option value="kb">KB</option><option value="mb">MB</option></select></div>
-                <div class="chips" id="cp-chips">
+                <div class="with-suffix"><input type="number" class="big-num" inputmode="decimal" id="cp-kb" min="1" step="any" value="100"><select class="sfx-sel" id="cp-unit" aria-label="Unit"><option value="kb">KB</option><option value="mb">MB</option></select></div>
+                <div class="chips size-chips c4" id="cp-chips">
                   <button type="button" class="chip" data-kb="10">10 KB</button>
                   <button type="button" class="chip" data-kb="20">20 KB</button>
                   <button type="button" class="chip" data-kb="30">30 KB</button>
@@ -200,6 +203,7 @@
                   <button type="button" class="chip" data-kb="500">500 KB</button>
                   <button type="button" class="chip" data-kb="1024">1 MB</button>
                 </div>
+                <p class="size-est" id="cp-est" hidden></p>
                 <p class="help">Exam forms often ask for photos under 50 KB and signatures under 20 KB.</p>
                 <label class="check"><input type="checkbox" id="cp-grow"> Make smaller files bigger to reach this size</label></div>
               <div class="two">
@@ -215,7 +219,7 @@
             <div class="panel-b" style="padding:0">
               <div class="field"><span class="lbl" id="rs-mode-l">Resize by</span>
                 <div class="seg" role="radiogroup" aria-labelledby="rs-mode-l">
-                  <label><input type="radio" name="rs-mode" id="rs-m-px" value="px" checked><span>Pixels</span></label>
+                  <label><input type="radio" name="rs-mode" id="rs-m-px" value="px" checked><span>Size</span></label>
                   <label><input type="radio" name="rs-mode" id="rs-m-pct" value="pct"><span>Percentage</span></label>
                 </div></div>
               <div id="rs-px-field" class="panel-b" style="padding:0">
@@ -231,6 +235,7 @@
                   <span class="x">×</span>
                   <div class="field"><label for="rs-h">Height</label><input type="number" id="rs-h" min="0" step="1" value="800"></div>
                 </div>
+                <p class="size-est" id="rs-out" hidden></p>
                 <div class="field" id="rs-dpi-field" hidden><label for="rs-dpi">DPI</label>
                   <select id="rs-dpi"><option value="72">72 DPI</option><option value="96">96 DPI</option><option value="150">150 DPI</option><option value="200">200 DPI</option><option value="300" selected>300 DPI</option><option value="600">600 DPI</option></select>
                   <p class="help">Forms usually ask for 200 or 300 DPI. 3.5 × 4.5 cm at 300 DPI is 413 × 531 px.</p></div>
@@ -399,13 +404,13 @@
   </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
-<script src="/assets/hi.js?v=5"></script>
-<script src="/assets/i18n-core.js?v=5"></script>
-<script src="/assets/ui.js?v=5"></script>
+<script src="/assets/hi.js?v=6"></script>
+<script src="/assets/i18n-core.js?v=6"></script>
+<script src="/assets/ui.js?v=6"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>window.SARAL_PAGE={tool:"pdf2img"};</script>
-<script src="/assets/app.js?v=5"></script>
+<script src="/assets/app.js?v=6"></script>
 </body>
 </html>

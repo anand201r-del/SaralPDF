@@ -272,6 +272,7 @@ function renderFiles(){
   if(st.files.some(f=>f.sample))hint=t("Examples shown. Add your own files to replace them.");
   else if(tool.editor&&n>1)hint=t("Tap a file to adjust its crop");
   else if(tool.reorder&&n>1)hint=t("Drag rows to change the order");
+  syncSizeEst();
   foot.innerHTML=n?"<span>"+esc(filesN(n))+", "+fmt(total)+(tool.accept==="pdf"&&pg?", "+esc(pages(pg)):"")+"</span>"+(hint?"<span>"+esc(hint)+"</span>":""):"";
 }
 function updateRun(){
@@ -297,6 +298,8 @@ function renderResults(){
     line='<div class="sz">'+fmt(before)+'<span class="arrow">→</span>'+fmt(after)+'</div><div class="sub">'+
       (pct>0?'<span class="pct">'+esc(t("{n}% smaller",{n:pct}))+'</span>, ':pct<0?esc(t("{n}% larger",{n:-pct}))+', ':'')+esc(r.label)+'</div>';
   }else line='<div class="sz">'+fmt(after)+'</div><div class="sub">'+esc(r.label)+'</div>';
+  if(r.fit){const ok=r.items.every(it=>it.blob.size<=r.fit*1024);
+    line+='<div class="fit '+(ok?"ok":"no")+'">'+esc(ok?"✓ "+t("Fits under {size}",{size:sizeLabel(r.fit)}):t("Over {size}",{size:sizeLabel(r.fit)}))+'</div>';}
   const formTool=["exam","compress","crop","bgremove"].includes(st.tool);
   $("#summary").innerHTML='<div>'+line+'</div><div class="stamp" aria-hidden="true"><b>'+esc(t(formTool?"Form ready":"Ready"))+'</b><small>'+esc(filesN(r.items.length))+'</small></div>';
   $("#res-list").innerHTML=r.items.length>1||r.items[0].note||r.items[0].preview?r.items.map((it,i)=>{
@@ -330,6 +333,8 @@ function render(){
   $("#pick-label").textContent=has?t("Add files"):t("Choose files");
   $("#pick-label").classList.toggle("big",!has);$("#pick-label").classList.toggle("primary",!has);
   $("#try-example").hidden=!accepts(tool,"image");
+  document.querySelectorAll(".drop .img-only").forEach(el=>el.hidden=tool.accept==="pdf");
+  document.querySelectorAll(".drop .pdf-only").forEach(el=>el.hidden=tool.accept!=="pdf");
   $("#picker").accept=tool.accept==="any"?"image/*,.heic,.heif,application/pdf,.pdf":tool.accept==="pdf"?"application/pdf,.pdf":"image/*,.heic,.heif";
   $("#picker").multiple=true;
   if(st.tool==="enhance")syncEnhanceUI();
@@ -462,7 +467,7 @@ async function runImg2Pdf(files){
     bytes=fit.bytes;if(!fit.ok)note=t("Couldn't get under {size}. This is the smallest version.",{size:sizeLabel(maxKb)});
   }else{prog(1,1,t("Writing PDF…"));await tick();bytes=await doc.save();}
   const name=cleanName($("#i2p-name").value,"saralpdf-document")+".pdf";
-  return {items:[{name,blob:new Blob([bytes],{type:"application/pdf"}),before,note}],compare:false,label:pages(n)+" · "+(size==="fit"?t("page size matches each image"):$("#i2p-size").selectedOptions[0].text)+(maxKb?" · "+t("under {size}",{size:sizeLabel(maxKb)}):""),zipName:name};
+  return {items:[{name,blob:new Blob([bytes],{type:"application/pdf"}),before,note}],compare:false,label:pages(n)+" · "+(size==="fit"?t("page size matches each image"):$("#i2p-size").selectedOptions[0].text)+(maxKb?" · "+t("under {size}",{size:sizeLabel(maxKb)}):""),fit:maxKb,zipName:name};
 }
 function parseRange(str,max){
   str=str.trim();if(!str)return Array.from({length:max},(_,i)=>i+1);
@@ -554,7 +559,7 @@ async function runCompress(files){
     try{const r=await compressOne(f,o);items.push({name:base(f.name)+(r.kept?"":"-compressed")+"."+extFor(r.type),blob:r.blob,before:f.size,dims:r.dims,note:r.note});}
     catch(e){addErr(t("Skipped “{name}”: the image couldn't be read.",{name:f.name}));}}
   if(!items.length)throw new Error(t("No images could be compressed."));
-  return {items,compare:true,label:o.mode==="target"?t("target {size} each",{size:sizeLabel(o.kb)}):t("quality {q}",{q:Math.round(o.q*100)}),zipName:"saralpdf-compressed.zip"};
+  return {items,compare:true,label:o.mode==="target"?t("target {size} each",{size:sizeLabel(o.kb)}):t("quality {q}",{q:Math.round(o.q*100)}),fit:o.mode==="target"?o.kb:0,zipName:"saralpdf-compressed.zip"};
 }
 async function runResize(files){
   const mode=radio("rs-mode"),unit=radio("rs-unit"),dpi=rsDpi(),W=Math.round(toPx(+$("#rs-w").value)),H=Math.round(toPx(+$("#rs-h").value)),lock=$("#rs-lock").checked,pct=+$("#rs-pct").value/100,fmtSel=$("#rs-fmt").value;
@@ -687,7 +692,7 @@ async function runPdfCompress(files){
     items.push({name,blob,before:f.size,dims:pages(d.numPages),note});
     closeDoc(d);
   }
-  return {items,compare:true,label:(maxKb?t("target {size} each",{size:sizeLabel(maxKb)}):t(lv.label))+(gray?" · "+t("black and white"):""),zipName:"saralpdf-compressed-pdfs.zip"};
+  return {items,compare:true,label:(maxKb?t("target {size} each",{size:sizeLabel(maxKb)}):t(lv.label))+(gray?" · "+t("black and white"):""),fit:maxKb,zipName:"saralpdf-compressed-pdfs.zip"};
 }
 const BG_LIB="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.8/+esm";
 let bgLibP=null;
@@ -826,7 +831,7 @@ function syncPcHelp(){$("#pc-help").textContent=t(PC_LEVEL[radio("pc-level")].he
 document.querySelectorAll('input[name="pc-level"]').forEach(r=>r.addEventListener("change",syncPcHelp));
 document.querySelectorAll('input[name="bg-out"]').forEach(r=>r.addEventListener("change",()=>{$("#bg-color-field").hidden=radio("bg-out")!=="color";}));
 $("#bg-swatches").addEventListener("click",e=>{const c=e.target.closest("[data-color]");if(c)$("#bg-color").value=c.dataset.color;});
-function syncResizeDefaults(){const f=st.files.find(x=>x.w);if(!f)return;$("#rs-w").value=fromPx(Math.round(f.w/2));$("#rs-h").value=fromPx(Math.round(f.h/2));}
+function syncResizeDefaults(){const f=st.files.find(x=>x.w);if(!f)return;$("#rs-w").value=fromPx(Math.round(f.w/2));$("#rs-h").value=fromPx(Math.round(f.h/2));syncRsOut();}
 /* resize units: physical sizes become pixels through the DPI */
 const PER_INCH={cm:2.54,mm:25.4,in:1};
 const rsDpi=()=>Math.max(1,+$("#rs-dpi").value||300);
@@ -836,8 +841,13 @@ let rsUnitPrev="px";
 function syncRsUnit(){
   const u=radio("rs-unit");
   ["#rs-w","#rs-h"].forEach(s=>{const v=+$(s).value;if(v>0)$(s).value=fromPx(toPx(v,rsUnitPrev),u);$(s).step=u==="px"?"1":"any";});
-  rsUnitPrev=u;$("#rs-dpi-field").hidden=u==="px";
+  rsUnitPrev=u;$("#rs-dpi-field").hidden=u==="px";syncRsOut();
 }
+function syncRsOut(){
+  const u=radio("rs-unit"),w=Math.round(toPx(+$("#rs-w").value)),h=Math.round(toPx(+$("#rs-h").value));
+  setEst("#rs-out",u==="px"||!(w>0&&h>0)?"":esc(t("= {w} × {h} px at {dpi} DPI",{w,h,dpi:rsDpi()})));
+}
+["#rs-w","#rs-h"].forEach(s=>$(s).addEventListener("input",()=>setTimeout(syncRsOut)));$("#rs-dpi").addEventListener("change",syncRsOut);
 document.querySelectorAll('input[name="rs-unit"]').forEach(r=>r.addEventListener("change",syncRsUnit));
 function ratio(){const f=st.files.find(x=>x.w);return f?f.h/f.w:null;}
 function syncRsHelp(){$("#rs-help").textContent=t($("#rs-lock").checked?"With aspect ratio kept, each image fits inside this box.":"Every image is stretched to exactly this size.");}
@@ -934,12 +944,40 @@ $("#try-example").addEventListener("click",()=>{loadSamples();});
   window.addEventListener("dragleave",e=>{if(!isFiles(e))return;depth=Math.max(0,depth-1);if(!depth)ov.hidden=true;});
   window.addEventListener("drop",()=>{depth=0;ov.hidden=true;});})();
 const cpq=$("#cp-q");cpq.addEventListener("input",()=>$("#cp-q-out").value=cpq.value);
-function syncCpMode(){const tg=radio("cp-mode")==="target";$("#cp-t-field").hidden=!tg;$("#cp-q-field").hidden=tg;}
+function syncCpMode(){const tg=radio("cp-mode")==="target";$("#cp-t-field").hidden=!tg;$("#cp-q-field").hidden=tg;syncSizeEst();}
 document.querySelectorAll('input[name="cp-mode"]').forEach(r=>r.addEventListener("change",syncCpMode));
-function syncPcMode(){const tg=radio("pc-mode")==="target";$("#pc-t-field").hidden=!tg;$("#pc-level-field").hidden=tg;}
+function syncPcMode(){const tg=radio("pc-mode")==="target";$("#pc-t-field").hidden=!tg;$("#pc-level-field").hidden=tg;syncSizeEst();}
 document.querySelectorAll('input[name="pc-mode"]').forEach(r=>r.addEventListener("change",syncPcMode));
 const SIZE_BOX={compress:["cp-mode","#cp-kb","#cp-unit","#cp-chips"],pdfcompress:["pc-mode","#pc-kb","#pc-unit","#pc-chips"],img2pdf:[null,"#i2p-kb","#i2p-unit","#i2p-chips"]};
-const markSize={};Object.entries(SIZE_BOX).forEach(([k,b])=>markSize[k]=bindSizeChips(b[3],b[1],b[2]));
+const markSize={};Object.entries(SIZE_BOX).forEach(([k,b])=>{markSize[k]=bindSizeChips(b[3],b[1],b[2]);
+  [b[1],b[2],b[3]].forEach(s=>["input","change","click"].forEach(ev=>$(s).addEventListener(ev,syncSizeEst)));});
+["#cp-grow"].forEach(s=>$(s).addEventListener("change",syncSizeEst));
+/* live hint under each size box: how the target compares to the files added */
+function setEst(id,html,warn){const el=$(id);el.hidden=!html;el.innerHTML=html||"";el.classList.toggle("warn",!!warn);}
+function syncSizeEst(){
+  const ok=st.files.filter(f=>!f.bad),big=ok.reduce((a,f)=>Math.max(a,f.size),0);
+  const smaller=(from,kb)=>' <span class="down">'+esc(t("about {n}% smaller",{n:Math.max(1,Math.round((1-kb*1024/from)*100))}))+'</span>';
+  if(st.tool==="pdfcompress"){
+    const kb=sizeKb("#pc-kb","#pc-unit"),size=sizeLabel(kb);
+    if(!ok.length||!kb||radio("pc-mode")!=="target")return setEst("#pc-est","");
+    if(big<=kb*1024)return setEst("#pc-est",esc(t(ok.length>1?"All your PDFs are already under {size}. They will be kept as they are.":"Your PDF is already under {size}. It will be kept as it is.",{size})));
+    const pg=Math.max(...ok.map(f=>f.pages||1));
+    if(kb*1024/pg<12*1024)return setEst("#pc-est",esc(t("{size} is very small for {n} pages. Text may be hard to read.",{size,n:pg})),true);
+    return setEst("#pc-est",esc(fmt(big))+" → "+esc(t("under {size}",{size}))+smaller(big,kb));
+  }
+  if(st.tool==="compress"){
+    const kb=sizeKb("#cp-kb","#cp-unit"),size=sizeLabel(kb);
+    if(!ok.length||!kb||radio("cp-mode")!=="target")return setEst("#cp-est","");
+    if(big<=kb*1024)return setEst("#cp-est",esc($("#cp-grow").checked?t("{from} → about {size}. The file is made bigger, the picture stays the same.",{from:fmt(big),size}):t("Already under {size}. Tick the box below if your form needs a bigger file.",{size})));
+    return setEst("#cp-est",esc(fmt(big))+" → "+esc(t("under {size}",{size}))+smaller(big,kb));
+  }
+  if(st.tool==="img2pdf"){
+    const kb=sizeKb("#i2p-kb","#i2p-unit"),size=sizeLabel(kb),tot=ok.reduce((a,f)=>a+f.size,0);
+    if(!ok.length||!kb)return setEst("#i2p-est","");
+    if(kb*1024/ok.length<15*1024)return setEst("#i2p-est",esc(t("{size} is very small for {n} pages. Photos may look blurry.",{size,n:ok.length})),true);
+    return setEst("#i2p-est",esc(t("{n} images, {from} → PDF under {size}",{n:ok.length,from:fmt(tot),size})));
+  }
+}
 /* preset a target size from the page (e.g. /compress-pdf-to-200kb/) or from ?kb=200 */
 function applyTargetKb(tool,kb){
   const b=SIZE_BOX[tool];if(!b||!(kb>0))return;
@@ -999,7 +1037,7 @@ async function loadSamples(){
 
 /* ---------- language ---------- */
 function refreshLanguage(){
-  buildPresetSelect();syncPreset(false);syncPcHelp();syncRsHelp();
+  buildPresetSelect();syncPreset(false);syncPcHelp();syncRsHelp();syncRsOut();
   st.files.forEach(f=>{if(f.img)f.info=f.w+" × "+f.h+" px"+(f.converted?" · "+t("converted from HEIC"):"");else if(f.pages)f.info=pages(f.pages);});
   if(!st.busy&&st.results)st.results.label=st.results.label; // labels keep the language they were made in
   render();
