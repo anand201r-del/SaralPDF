@@ -86,6 +86,62 @@ async function padJpeg(blob,minBytes){
   return new Blob([buf.slice(0,2),...segs,buf.slice(2)],{type:"image/jpeg"});
 }
 
+/* write DPI into the JPEG JFIF header so forms and print shops read the right physical size */
+async function setJpegDpi(blob,dpi){
+  const b=new Uint8Array(await blob.arrayBuffer());dpi=Math.round(dpi);
+  if(b[0]!==0xFF||b[1]!==0xD8)return blob;
+  if(b[2]===0xFF&&b[3]===0xE0&&b[6]===0x4A&&b[7]===0x46&&b[8]===0x49&&b[9]===0x46){
+    b[13]=1;b[14]=dpi>>8;b[15]=dpi&255;b[16]=dpi>>8;b[17]=dpi&255;return new Blob([b],{type:"image/jpeg"});}
+  const app0=new Uint8Array([0xFF,0xE0,0,16,0x4A,0x46,0x49,0x46,0,1,1,1,dpi>>8,dpi&255,dpi>>8,dpi&255,0,0]);
+  return new Blob([b.slice(0,2),app0,b.slice(2)],{type:"image/jpeg"});
+}
+
+/* ---------- target size (KB / MB) ---------- */
+/* read a size box with its KB/MB unit, in KB (0 when empty) */
+function sizeKb(inp,unit){const v=+$(inp).value;if(!(v>0))return 0;return $(unit).value==="mb"?v*1024:v;}
+function setSize(inp,unit,kb){const mb=kb>=1024&&kb%1024===0;$(unit).value=mb?"mb":"kb";$(inp).value=mb?kb/1024:kb;}
+const sizeLabel=kb=>kb>=1024?(+(kb/1024).toFixed(2))+" MB":(+kb.toFixed(1))+" KB";
+function bindSizeChips(chips,inp,unit){
+  const mark=()=>{const v=sizeKb(inp,unit);document.querySelectorAll(chips+" .chip").forEach(c=>c.classList.toggle("on",Math.abs(+c.dataset.kb-v)<0.01));};
+  $(chips).addEventListener("click",e=>{const c=e.target.closest("[data-kb]");if(!c)return;setSize(inp,unit,+c.dataset.kb);mark();});
+  $(inp).addEventListener("input",mark);$(unit).addEventListener("change",mark);mark();
+  return mark;
+}
+const decodeBlob=b=>window.createImageBitmap?createImageBitmap(b).catch(()=>imgFromFile(b)):imgFromFile(b);
+/* Turn page sources ({blob,w,h}) into JPEGs whose total fits the budget.
+   Quality is preferred over resolution: each scale step tries quality 0.35–0.92 before going smaller. */
+const FIT_SCALES=[1,.8,.66,.53,.42,.33,.26,.2,.15];
+async function jpegsUnder(srcs,budget,status){
+  const px=srcs.reduce((a,s)=>a+s.w*s.h,0);let last=null;
+  for(let si=0;si<FIT_SCALES.length;si++){
+    const s=FIT_SCALES[si],final=si===FIT_SCALES.length-1;
+    const cache=px*s*s<=16e6?[]:null; // keep canvases in memory only when they are small
+    const canvas=async i=>{if(cache&&cache[i])return cache[i];const img=await decodeBlob(srcs[i].blob);const c=canvasFor(img,srcs[i].w*s,srcs[i].h*s,true);if(img.close)img.close();if(cache)cache[i]=c;return c;};
+    const enc=async(q,full)=>{const out=[];let sum=0;
+      for(let i=0;i<srcs.length;i++){const c=await canvas(i);const b=await toBlob(c,"image/jpeg",q);if(!cache)c.width=c.height=0;out.push(b);sum+=b.size;if(!full&&sum>budget)return null;}
+      return {out,sum,q};};
+    status(s);await tick();
+    const lo0=final?0.05:0.35;let r=await enc(lo0,final);
+    if(!r||r.sum>budget){last=r;continue;}
+    let best=r,lo=lo0,hi=0.92;
+    for(let k=0;k<5;k++){const q=(lo+hi)/2;const x=await enc(q,false);if(x){best=x;lo=q;}else hi=q;}
+    if(cache)cache.forEach(c=>c.width=c.height=0);
+    return {jpgs:best.out,scale:s,q:best.q,ok:true};
+  }
+  return {jpgs:last.out,scale:FIT_SCALES[FIT_SCALES.length-1],q:0.05,ok:false};
+}
+/* build a PDF from fitted JPEGs; PDF structure adds a little, so re-fit with a smaller budget if needed */
+async function fitPdf(srcs,maxBytes,build,status){
+  let budget=maxBytes-1500-600*srcs.length,r,bytes;
+  for(let k=0;k<4;k++){
+    r=await jpegsUnder(srcs,Math.max(budget,512*srcs.length),status);
+    bytes=await build(r.jpgs);
+    if(bytes.length<=maxBytes||!r.ok)break;
+    budget-=bytes.length-maxBytes+1024;
+  }
+  return {bytes,ok:bytes.length<=maxBytes,scale:r.scale};
+}
+
 /* ---------- toast & errors ---------- */
 let toastT;
 function toast(msg){const el=$("#toast");el.textContent=msg;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,3200);}
@@ -374,26 +430,39 @@ const cleanName=(v,fb)=>(v||"").trim().replace(/[\\/:*?"<>|]+/g,"-").replace(/\.
 
 async function runImg2Pdf(files){
   const {PDFDocument}=PDFLib;const doc=await PDFDocument.create();
-  const size=$("#i2p-size").value,orient=radio("i2p-orient"),m=+radio("i2p-margin");
-  let before=0,n=0;
+  const size=$("#i2p-size").value,orient=radio("i2p-orient"),m=+radio("i2p-margin"),maxKb=sizeKb("#i2p-kb","#i2p-unit");
+  const place=(d,emb,iw,ih)=>{ // iw, ih: original pixel size, so page layout doesn't change when images are shrunk to fit
+    let pw,ph;
+    if(size==="fit"){pw=iw*0.75+2*m;ph=ih*0.75+2*m;}
+    else{[pw,ph]=PAGE[size];const land=orient==="landscape"||(orient==="auto"&&iw>ih);if(land)[pw,ph]=[ph,pw];}
+    const s=size==="fit"?0.75:Math.min((pw-2*m)/iw,(ph-2*m)/ih);
+    const w=iw*s,h=ih*s;d.addPage([pw,ph]).drawImage(emb,{x:(pw-w)/2,y:(ph-h)/2,width:w,height:h});
+  };
+  let before=0,n=0,note="";const srcs=[];
   for(let i=0;i<files.length;i++){
     const f=files[i];prog(i,files.length,t("Adding page {i} of {n}",{i:i+1,n:files.length})+" · "+f.name);await tick();
     try{
+      if(maxKb){const img=await imgFromFile(f.file);const iw=img.naturalWidth,ih=img.naturalHeight,k=Math.min(1,2400/Math.max(iw,ih));
+        srcs.push({blob:f.file,w:iw*k,h:ih*k,iw,ih});before+=f.size;n++;continue;}
       let emb;
       if(f.file.type==="image/png"){emb=await doc.embedPng(await f.file.arrayBuffer());}
       else{const img=await imgFromFile(f.file);const c=canvasFor(img,img.naturalWidth,img.naturalHeight,true);emb=await doc.embedJpg(await (await toBlob(c,"image/jpeg",0.92)).arrayBuffer());}
-      const iw=emb.width,ih=emb.height;let pw,ph;
-      if(size==="fit"){pw=iw*0.75+2*m;ph=ih*0.75+2*m;}
-      else{[pw,ph]=PAGE[size];const land=orient==="landscape"||(orient==="auto"&&iw>ih);if(land)[pw,ph]=[ph,pw];}
-      const s=size==="fit"?0.75:Math.min((pw-2*m)/iw,(ph-2*m)/ih);
-      const w=iw*s,h=ih*s;doc.addPage([pw,ph]).drawImage(emb,{x:(pw-w)/2,y:(ph-h)/2,width:w,height:h});
+      place(doc,emb,emb.width,emb.height);
       before+=f.size;n++;
     }catch(e){addErr(t("Skipped “{name}”: the image couldn't be read.",{name:f.name}));}
   }
   if(!n)throw new Error(t("No images could be added to the PDF."));
-  prog(1,1,t("Writing PDF…"));await tick();
-  const bytes=await doc.save();const name=cleanName($("#i2p-name").value,"saralpdf-document")+".pdf";
-  return {items:[{name,blob:new Blob([bytes],{type:"application/pdf"}),before}],compare:false,label:pages(n)+" · "+(size==="fit"?t("page size matches each image"):$("#i2p-size").selectedOptions[0].text),zipName:name};
+  let bytes;
+  if(maxKb){
+    const fit=await fitPdf(srcs,maxKb*1024,async jpgs=>{
+      const d=await PDFDocument.create();
+      for(let i=0;i<jpgs.length;i++)place(d,await d.embedJpg(await jpgs[i].arrayBuffer()),srcs[i].iw,srcs[i].ih);
+      return d.save();
+    },()=>prog(1,2,t("Finding the best quality under {size}…",{size:sizeLabel(maxKb)})));
+    bytes=fit.bytes;if(!fit.ok)note=t("Couldn't get under {size}. This is the smallest version.",{size:sizeLabel(maxKb)});
+  }else{prog(1,1,t("Writing PDF…"));await tick();bytes=await doc.save();}
+  const name=cleanName($("#i2p-name").value,"saralpdf-document")+".pdf";
+  return {items:[{name,blob:new Blob([bytes],{type:"application/pdf"}),before,note}],compare:false,label:pages(n)+" · "+(size==="fit"?t("page size matches each image"):$("#i2p-size").selectedOptions[0].text)+(maxKb?" · "+t("under {size}",{size:sizeLabel(maxKb)}):""),zipName:name};
 }
 function parseRange(str,max){
   str=str.trim();if(!str)return Array.from({length:max},(_,i)=>i+1);
@@ -467,25 +536,29 @@ async function compressOne(f,o){
   const resized=w!==img.naturalWidth;let note="";
   if(o.mode==="target"){
     const {best,smallest}=await fitUnder(img,w,h,type,o.kb*1024,true);const pick=best||smallest;
-    if(!best)note=t("Couldn't get under {kb} KB. This is the smallest version.",{kb:o.kb});
+    let blob=pick.blob;
+    if(!best)note=t("Couldn't get under {size}. This is the smallest version.",{size:sizeLabel(o.kb)});
     else if(pick.w!==Math.round(w))note=t("Scaled to {w} × {h} px to fit the size limit.",{w:pick.w,h:pick.h});
-    return {blob:pick.blob,dims:pick.w+" × "+pick.h+" px",note,type:pick.blob.type||type};
+    if(best&&o.grow&&type==="image/jpeg"&&blob.size<o.kb*1024*0.9){
+      blob=await padJpeg(blob,Math.floor(o.kb*1024*0.97)-64);note=t("Size raised to about {size}. The image itself is unchanged.",{size:sizeLabel(o.kb)});}
+    return {blob,dims:pick.w+" × "+pick.h+" px",note,type:blob.type||type};
   }
   const c=canvasFor(img,w,h,type==="image/jpeg");let blob=await toBlob(c,type,o.q);
   if(!resized&&type===orig&&blob.size>=f.size){blob=f.file;note=t("Already well compressed, so the original was kept.");}
   return {blob,dims:c.width+" × "+c.height+" px",note,type:blob.type||type,kept:blob===f.file};
 }
 async function runCompress(files){
-  const o={mode:radio("cp-mode"),q:+$("#cp-q").value/100,kb:Math.max(1,+$("#cp-kb").value||100),fmt:$("#cp-fmt").value,maxw:+$("#cp-maxw").value};
+  const o={mode:radio("cp-mode"),q:+$("#cp-q").value/100,kb:sizeKb("#cp-kb","#cp-unit")||100,grow:$("#cp-grow").checked,fmt:$("#cp-fmt").value,maxw:+$("#cp-maxw").value};
   const items=[];
   for(let i=0;i<files.length;i++){const f=files[i];prog(i,files.length,t("Compressing {i} of {n}",{i:i+1,n:files.length})+" · "+f.name);await tick();
     try{const r=await compressOne(f,o);items.push({name:base(f.name)+(r.kept?"":"-compressed")+"."+extFor(r.type),blob:r.blob,before:f.size,dims:r.dims,note:r.note});}
     catch(e){addErr(t("Skipped “{name}”: the image couldn't be read.",{name:f.name}));}}
   if(!items.length)throw new Error(t("No images could be compressed."));
-  return {items,compare:true,label:o.mode==="target"?t("target {kb} KB each",{kb:o.kb}):t("quality {q}",{q:Math.round(o.q*100)}),zipName:"saralpdf-compressed.zip"};
+  return {items,compare:true,label:o.mode==="target"?t("target {size} each",{size:sizeLabel(o.kb)}):t("quality {q}",{q:Math.round(o.q*100)}),zipName:"saralpdf-compressed.zip"};
 }
 async function runResize(files){
-  const mode=radio("rs-mode"),W=+$("#rs-w").value,H=+$("#rs-h").value,lock=$("#rs-lock").checked,pct=+$("#rs-pct").value/100,fmtSel=$("#rs-fmt").value;
+  const mode=radio("rs-mode"),unit=radio("rs-unit"),dpi=rsDpi(),W=Math.round(toPx(+$("#rs-w").value)),H=Math.round(toPx(+$("#rs-h").value)),lock=$("#rs-lock").checked,pct=+$("#rs-pct").value/100,fmtSel=$("#rs-fmt").value;
+  const phys=mode==="px"&&unit!=="px";
   if(mode==="px"&&(!(W>0)||!(H>0)))throw new Error(t("Enter a width and height greater than 0."));
   if(mode==="pct"&&!(pct>0))throw new Error(t("Enter a percentage greater than 0."));
   const items=[];
@@ -495,11 +568,12 @@ async function runResize(files){
       if(mode==="pct"){w=iw*pct;h=ih*pct;}else if(lock){const s=Math.min(W/iw,H/ih);w=iw*s;h=ih*s;}else{w=W;h=H;}
       w=Math.min(10000,Math.max(1,Math.round(w)));h=Math.min(10000,Math.max(1,Math.round(h)));
       const type=fmtSel==="keep"?origType(f):fmtSel;
-      const c=canvasFor(img,w,h,type==="image/jpeg");const blob=await toBlob(c,type,0.92);
+      const c=canvasFor(img,w,h,type==="image/jpeg");let blob=await toBlob(c,type,0.92);
+      if(phys&&blob.type==="image/jpeg")blob=await setJpegDpi(blob,dpi);
       items.push({name:base(f.name)+"-"+w+"x"+h+"."+extFor(blob.type||type),blob,before:f.size,dims:iw+" × "+ih+" → "+w+" × "+h+" px"});
     }catch(e){addErr(t("Skipped “{name}”: the image couldn't be read.",{name:f.name}));}}
   if(!items.length)throw new Error(t("No images could be resized."));
-  return {items,compare:true,label:mode==="pct"?t("scaled to {n}%",{n:Math.round(pct*100)}):t(lock?"fit within {w} × {h} px":"exactly {w} × {h} px",{w:W,h:H}),zipName:"saralpdf-resized.zip"};
+  return {items,compare:true,label:mode==="pct"?t("scaled to {n}%",{n:Math.round(pct*100)}):t(lock?"fit within {w} × {h} px":"exactly {w} × {h} px",{w:W,h:H})+(phys?" · "+(+$("#rs-w").value)+" × "+(+$("#rs-h").value)+" "+unit+" @ "+dpi+" DPI":""),zipName:"saralpdf-resized.zip"};
 }
 async function runCrop(files){
   const fmtSel=$("#cr-fmt").value;const items=[];
@@ -551,13 +625,49 @@ async function runConvert(files){
   return {items,compare:true,label:t("converted to {f}",{f:extFor(type).toUpperCase()}),zipName:"saralpdf-converted.zip"};
 }
 const PC_LEVEL={light:{dpi:150,q:0.8,label:"Light",help:"150 DPI, high quality. Smaller savings."},medium:{dpi:110,q:0.62,label:"Recommended",help:"110 DPI, good quality. Suits most forms and email."},strong:{dpi:80,q:0.45,label:"Strong",help:"80 DPI, smallest files. Small text may blur."}};
+const PC_TARGET_DPI=150;
+async function pdfCompressTarget(f,d,maxKb,gray,step){
+  const maxBytes=maxKb*1024,size=sizeLabel(maxKb);
+  if(f.size<=maxBytes){step(d.numPages);return {blob:f.file,name:f.name,note:t("Already under {size}, so the original was kept.",{size})};}
+  const srcs=[];
+  for(let p=1;p<=d.numPages;p++){
+    step(1);await tick();
+    const pg=await d.getPage(p);const v1=pg.getViewport({scale:1});
+    let scale=PC_TARGET_DPI/72;if(Math.max(v1.width,v1.height)*scale>3000)scale=3000/Math.max(v1.width,v1.height);
+    const c=renderCanvas(pg,scale,gray);await c.done;
+    srcs.push({blob:await toBlob(c.canvas,"image/jpeg",0.92),w:c.canvas.width,h:c.canvas.height,pw:v1.width,ph:v1.height});
+    c.canvas.width=c.canvas.height=0;
+  }
+  const fit=await fitPdf(srcs,maxBytes,async jpgs=>{
+    const out=await PDFLib.PDFDocument.create();
+    for(let i=0;i<jpgs.length;i++){const s=srcs[i];out.addPage([s.pw,s.ph]).drawImage(await out.embedJpg(await jpgs[i].arrayBuffer()),{x:0,y:0,width:s.pw,height:s.ph});}
+    return out.save({useObjectStreams:true});
+  },sc=>prog(1,1,t("Finding the best quality under {size}…",{size})+" · "+f.name+" · "+Math.round(PC_TARGET_DPI*sc)+" DPI"));
+  const blob=new Blob([fit.bytes],{type:"application/pdf"});
+  if(!fit.ok&&blob.size>=f.size)return {blob:f.file,name:f.name,note:t("Couldn't get under {size}. This is the smallest version.",{size})};
+  return {blob,name:base(f.name)+"-compressed.pdf",dpi:Math.round(PC_TARGET_DPI*fit.scale),note:fit.ok?"":t("Couldn't get under {size}. This is the smallest version.",{size})};
+}
+function renderCanvas(pg,scale,gray){
+  const v=pg.getViewport({scale});const c=document.createElement("canvas");c.width=Math.ceil(v.width);c.height=Math.ceil(v.height);
+  const ctx=c.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,c.width,c.height);
+  const done=pg.render({canvasContext:ctx,viewport:v}).promise.then(()=>{
+    if(gray){const im=ctx.getImageData(0,0,c.width,c.height),a=im.data;for(let i=0;i<a.length;i+=4){const y=a[i]*.299+a[i+1]*.587+a[i+2]*.114;a[i]=a[i+1]=a[i+2]=y;}ctx.putImageData(im,0,0);}});
+  return {canvas:c,done};
+}
 async function runPdfCompress(files){
   const {PDFDocument}=PDFLib;const lv=PC_LEVEL[radio("pc-level")],gray=$("#pc-gray").checked;
+  const maxKb=radio("pc-mode")==="target"?sizeKb("#pc-kb","#pc-unit"):0;
+  if(radio("pc-mode")==="target"&&!maxKb)throw new Error(t("Enter a target size greater than 0."));
   const docs=[];let total=0;
   for(const f of files){try{const d=await openPdf(f);docs.push({f,d});total+=d.numPages;}catch(e){addErr(pdfErr(f,e));}}
   if(!total)throw new Error(t("No readable PDFs to compress."));
   const items=[];let done=0;
   for(const {f,d} of docs){
+    if(maxKb){
+      const r=await pdfCompressTarget(f,d,maxKb,gray,k=>{done+=k;prog(done,total,t("Page {i} of {n}",{i:Math.min(done,total),n:total})+" · "+f.name);});
+      items.push({name:r.name,blob:r.blob,before:f.size,dims:pages(d.numPages)+(r.dpi?" · "+r.dpi+" DPI":""),note:r.note});
+      closeDoc(d);continue;
+    }
     const out=await PDFDocument.create();
     for(let p=1;p<=d.numPages;p++){
       prog(done,total,t("Page {i} of {n}",{i:done+1,n:total})+" · "+f.name);await tick();
@@ -577,7 +687,7 @@ async function runPdfCompress(files){
     items.push({name,blob,before:f.size,dims:pages(d.numPages),note});
     closeDoc(d);
   }
-  return {items,compare:true,label:t(lv.label)+(gray?" · "+t("black and white"):""),zipName:"saralpdf-compressed-pdfs.zip"};
+  return {items,compare:true,label:(maxKb?t("target {size} each",{size:sizeLabel(maxKb)}):t(lv.label))+(gray?" · "+t("black and white"):""),zipName:"saralpdf-compressed-pdfs.zip"};
 }
 const BG_LIB="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.8/+esm";
 let bgLibP=null;
@@ -716,7 +826,19 @@ function syncPcHelp(){$("#pc-help").textContent=t(PC_LEVEL[radio("pc-level")].he
 document.querySelectorAll('input[name="pc-level"]').forEach(r=>r.addEventListener("change",syncPcHelp));
 document.querySelectorAll('input[name="bg-out"]').forEach(r=>r.addEventListener("change",()=>{$("#bg-color-field").hidden=radio("bg-out")!=="color";}));
 $("#bg-swatches").addEventListener("click",e=>{const c=e.target.closest("[data-color]");if(c)$("#bg-color").value=c.dataset.color;});
-function syncResizeDefaults(){const f=st.files.find(x=>x.w);if(!f)return;$("#rs-w").value=Math.round(f.w/2);$("#rs-h").value=Math.round(f.h/2);}
+function syncResizeDefaults(){const f=st.files.find(x=>x.w);if(!f)return;$("#rs-w").value=fromPx(Math.round(f.w/2));$("#rs-h").value=fromPx(Math.round(f.h/2));}
+/* resize units: physical sizes become pixels through the DPI */
+const PER_INCH={cm:2.54,mm:25.4,in:1};
+const rsDpi=()=>Math.max(1,+$("#rs-dpi").value||300);
+function toPx(v,u){u=u||radio("rs-unit");return u==="px"?v:v/PER_INCH[u]*rsDpi();}
+function fromPx(px,u){u=u||radio("rs-unit");if(u==="px")return Math.round(px);const v=px/rsDpi()*PER_INCH[u];return +v.toFixed(u==="mm"?1:2);}
+let rsUnitPrev="px";
+function syncRsUnit(){
+  const u=radio("rs-unit");
+  ["#rs-w","#rs-h"].forEach(s=>{const v=+$(s).value;if(v>0)$(s).value=fromPx(toPx(v,rsUnitPrev),u);$(s).step=u==="px"?"1":"any";});
+  rsUnitPrev=u;$("#rs-dpi-field").hidden=u==="px";
+}
+document.querySelectorAll('input[name="rs-unit"]').forEach(r=>r.addEventListener("change",syncRsUnit));
 function ratio(){const f=st.files.find(x=>x.w);return f?f.h/f.w:null;}
 function syncRsHelp(){$("#rs-help").textContent=t($("#rs-lock").checked?"With aspect ratio kept, each image fits inside this box.":"Every image is stretched to exactly this size.");}
 function syncConvertUI(){$("#cv-q-field").hidden=radio("cv-fmt")==="image/png";}
@@ -812,14 +934,22 @@ $("#try-example").addEventListener("click",()=>{loadSamples();});
   window.addEventListener("dragleave",e=>{if(!isFiles(e))return;depth=Math.max(0,depth-1);if(!depth)ov.hidden=true;});
   window.addEventListener("drop",()=>{depth=0;ov.hidden=true;});})();
 const cpq=$("#cp-q");cpq.addEventListener("input",()=>$("#cp-q-out").value=cpq.value);
-document.querySelectorAll('input[name="cp-mode"]').forEach(r=>r.addEventListener("change",()=>{const tg=radio("cp-mode")==="target";$("#cp-t-field").hidden=!tg;$("#cp-q-field").hidden=tg;}));
-function markChips(){const v=+$("#cp-kb").value;document.querySelectorAll("#cp-chips .chip").forEach(c=>c.classList.toggle("on",+c.dataset.kb===v));}
-$("#cp-chips").addEventListener("click",e=>{const c=e.target.closest("[data-kb]");if(!c)return;$("#cp-kb").value=c.dataset.kb;markChips();});
-$("#cp-kb").addEventListener("input",markChips);markChips();
+function syncCpMode(){const tg=radio("cp-mode")==="target";$("#cp-t-field").hidden=!tg;$("#cp-q-field").hidden=tg;}
+document.querySelectorAll('input[name="cp-mode"]').forEach(r=>r.addEventListener("change",syncCpMode));
+function syncPcMode(){const tg=radio("pc-mode")==="target";$("#pc-t-field").hidden=!tg;$("#pc-level-field").hidden=tg;}
+document.querySelectorAll('input[name="pc-mode"]').forEach(r=>r.addEventListener("change",syncPcMode));
+const SIZE_BOX={compress:["cp-mode","#cp-kb","#cp-unit","#cp-chips"],pdfcompress:["pc-mode","#pc-kb","#pc-unit","#pc-chips"],img2pdf:[null,"#i2p-kb","#i2p-unit","#i2p-chips"]};
+const markSize={};Object.entries(SIZE_BOX).forEach(([k,b])=>markSize[k]=bindSizeChips(b[3],b[1],b[2]));
+/* preset a target size from the page (e.g. /compress-pdf-to-200kb/) or from ?kb=200 */
+function applyTargetKb(tool,kb){
+  const b=SIZE_BOX[tool];if(!b||!(kb>0))return;
+  setSize(b[1],b[2],kb);markSize[tool]();
+  if(b[0]){document.querySelector('input[name="'+b[0]+'"][value="target"]').checked=true;syncCpMode();syncPcMode();}
+}
 document.querySelectorAll('input[name="rs-mode"]').forEach(r=>r.addEventListener("change",()=>{const p=radio("rs-mode")==="pct";$("#rs-pct-field").hidden=!p;$("#rs-px-field").hidden=p;}));
 document.querySelectorAll("[data-pct]").forEach(c=>c.addEventListener("click",()=>$("#rs-pct").value=c.dataset.pct));
-$("#rs-w").addEventListener("input",()=>{const r=ratio();if($("#rs-lock").checked&&r&&st.files.length===1)$("#rs-h").value=Math.max(1,Math.round(+$("#rs-w").value*r));});
-$("#rs-h").addEventListener("input",()=>{const r=ratio();if($("#rs-lock").checked&&r&&st.files.length===1)$("#rs-w").value=Math.max(1,Math.round(+$("#rs-h").value/r));});
+$("#rs-w").addEventListener("input",()=>{const r=ratio();if($("#rs-lock").checked&&r&&st.files.length===1)$("#rs-h").value=fromPx(Math.max(1,toPx(+$("#rs-w").value)*r));});
+$("#rs-h").addEventListener("input",()=>{const r=ratio();if($("#rs-lock").checked&&r&&st.files.length===1)$("#rs-w").value=fromPx(Math.max(1,toPx(+$("#rs-h").value)/r));});
 $("#rs-lock").addEventListener("change",syncRsHelp);
 
 /* ---------- example files ---------- */
@@ -880,6 +1010,7 @@ I.onChange(refreshLanguage);
 buildPresetSelect();syncPreset(true);syncPcHelp();syncRsHelp();
 const start=toolFromLocation()||page.tool||"img2pdf";
 st.tool=start;
+syncPcMode();applyTargetKb(start,+new URLSearchParams(location.search).get("kb")||page.kb);
 selectTool(start,"init");
 if(location.hash&&FROM_SLUG[location.hash.slice(1)])requestAnimationFrame(()=>$("#tools-sec").scrollIntoView({block:"start"}));
 })();

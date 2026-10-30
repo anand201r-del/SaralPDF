@@ -112,6 +112,9 @@ select:hover,input[type=text]:hover,input[type=number]:hover{border-color:var(--
 .with-suffix{display:flex;align-items:center;border:1px solid var(--line);background:var(--surface);border-radius:var(--r-sm);overflow:hidden}
 .with-suffix input{border:0;border-radius:0}
 .with-suffix .sfx{padding:0 11px;font-weight:600;font-size:13px;color:var(--muted)}
+.with-suffix .sfx-sel{width:auto;flex:none;border:0;border-left:1px solid var(--line);border-radius:0;background:var(--sunk);font-weight:600;font-size:13px;padding:10px 8px;cursor:pointer}
+.opt{font-weight:400;color:var(--muted)}
+.size-links{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .range-row{display:flex;align-items:center;gap:12px}
 .range-row input{flex:1;accent-color:var(--pen);min-width:0}
 .range-row output{font-weight:700;min-width:3ch;text-align:right}

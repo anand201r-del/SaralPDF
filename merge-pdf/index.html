@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,750&family=Hanken+Grotesk:wght@400;500;600;650;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap">
-<link rel="stylesheet" href="/assets/app.css?v=4">
+<link rel="stylesheet" href="/assets/app.css?v=5">
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebApplication", "name": "Merge PDF \u2013 SaralPDF", "url": "https://saralpdf.in/merge-pdf/", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "INR"}, "description": "Merge PDF files into one document in the order you choose. Free, works on phone and computer, and your documents are never uploaded."}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Are my documents uploaded?", "acceptedAnswer": {"@type": "Answer", "text": "No. Merging happens in your browser. Your PDFs never leave your device."}}, {"@type": "Question", "name": "Why is one of my PDFs skipped?", "acceptedAnswer": {"@type": "Answer", "text": "It may be password-protected or damaged. Remove the password in a PDF reader, save a new copy, and try again."}}]}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://saralpdf.in/"}, {"@type": "ListItem", "position": 2, "name": "Merge PDF", "item": "https://saralpdf.in/merge-pdf/"}]}]}</script>
 </head>
 <body>
@@ -105,6 +105,17 @@
                   <label><input type="radio" name="i2p-margin" id="i2p-m-1" value="18" checked><span>Small</span></label>
                   <label><input type="radio" name="i2p-margin" id="i2p-m-2" value="40"><span>Large</span></label>
                 </div></div>
+              <div class="field"><label for="i2p-kb">Max PDF size <span class="opt">(optional)</span></label>
+                <div class="with-suffix"><input type="number" id="i2p-kb" min="0" step="any" placeholder="No limit"><select class="sfx-sel" id="i2p-unit" aria-label="Unit"><option value="kb">KB</option><option value="mb">MB</option></select></div>
+                <div class="chips" id="i2p-chips">
+                  <button type="button" class="chip" data-kb="100">100 KB</button>
+                  <button type="button" class="chip" data-kb="200">200 KB</button>
+                  <button type="button" class="chip" data-kb="300">300 KB</button>
+                  <button type="button" class="chip" data-kb="500">500 KB</button>
+                  <button type="button" class="chip" data-kb="1024">1 MB</button>
+                  <button type="button" class="chip" data-kb="2048">2 MB</button>
+                </div>
+                <p class="help">Leave empty for the best quality. With a limit, images are compressed until the PDF fits.</p></div>
               <div class="field"><label for="i2p-name">File name</label>
                 <div class="with-suffix"><input type="text" id="i2p-name" value="saralpdf-document"><span class="sfx">.pdf</span></div></div>
             </div>
@@ -139,7 +150,23 @@
 
           <div data-for="pdfcompress">
             <div class="panel-b" style="padding:0">
-              <div class="field"><span class="lbl" id="pc-level-l">Compression</span>
+              <div class="field"><span class="lbl" id="pc-mode-l">Compress by</span>
+                <div class="seg" role="radiogroup" aria-labelledby="pc-mode-l">
+                  <label><input type="radio" name="pc-mode" id="pc-m-target" value="target" checked><span>Target size</span></label>
+                  <label><input type="radio" name="pc-mode" id="pc-m-level" value="level"><span>Level</span></label>
+                </div></div>
+              <div class="field" id="pc-t-field"><label for="pc-kb">Keep each PDF under</label>
+                <div class="with-suffix"><input type="number" id="pc-kb" min="1" step="any" value="300"><select class="sfx-sel" id="pc-unit" aria-label="Unit"><option value="kb">KB</option><option value="mb">MB</option></select></div>
+                <div class="chips" id="pc-chips">
+                  <button type="button" class="chip" data-kb="100">100 KB</button>
+                  <button type="button" class="chip" data-kb="200">200 KB</button>
+                  <button type="button" class="chip" data-kb="300">300 KB</button>
+                  <button type="button" class="chip" data-kb="500">500 KB</button>
+                  <button type="button" class="chip" data-kb="1024">1 MB</button>
+                  <button type="button" class="chip" data-kb="2048">2 MB</button>
+                </div>
+                <p class="help">SaralPDF finds the best quality that still fits under this size.</p></div>
+              <div class="field" id="pc-level-field" hidden><span class="lbl" id="pc-level-l">Compression</span>
                 <div class="seg" role="radiogroup" aria-labelledby="pc-level-l">
                   <label><input type="radio" name="pc-level" id="pc-l-light" value="light"><span>Light</span></label>
                   <label><input type="radio" name="pc-level" id="pc-l-med" value="medium" checked><span>Recommended</span></label>
@@ -162,15 +189,19 @@
                 <div class="range-row"><input type="range" id="cp-q" min="10" max="95" value="70"><output id="cp-q-out" for="cp-q">70</output></div>
                 <p class="help">70 is a good balance. Lower means smaller files.</p></div>
               <div class="field" id="cp-t-field" hidden><label for="cp-kb">Keep each image under</label>
-                <div class="with-suffix"><input type="number" id="cp-kb" min="5" max="20000" value="100"><span class="sfx">KB</span></div>
+                <div class="with-suffix"><input type="number" id="cp-kb" min="1" step="any" value="100"><select class="sfx-sel" id="cp-unit" aria-label="Unit"><option value="kb">KB</option><option value="mb">MB</option></select></div>
                 <div class="chips" id="cp-chips">
+                  <button type="button" class="chip" data-kb="10">10 KB</button>
                   <button type="button" class="chip" data-kb="20">20 KB</button>
+                  <button type="button" class="chip" data-kb="30">30 KB</button>
                   <button type="button" class="chip" data-kb="50">50 KB</button>
                   <button type="button" class="chip" data-kb="100">100 KB</button>
                   <button type="button" class="chip" data-kb="200">200 KB</button>
                   <button type="button" class="chip" data-kb="500">500 KB</button>
+                  <button type="button" class="chip" data-kb="1024">1 MB</button>
                 </div>
-                <p class="help">Exam forms often ask for photos under 50 KB and signatures under 20 KB.</p></div>
+                <p class="help">Exam forms often ask for photos under 50 KB and signatures under 20 KB.</p>
+                <label class="check"><input type="checkbox" id="cp-grow"> Make smaller files bigger to reach this size</label></div>
               <div class="two">
                 <div class="field"><label for="cp-fmt">Save as</label>
                   <select id="cp-fmt"><option value="keep">Same format</option><option value="image/jpeg">JPG</option><option value="image/webp">WebP</option></select></div>
@@ -188,11 +219,21 @@
                   <label><input type="radio" name="rs-mode" id="rs-m-pct" value="pct"><span>Percentage</span></label>
                 </div></div>
               <div id="rs-px-field" class="panel-b" style="padding:0">
+                <div class="field"><span class="lbl" id="rs-unit-l">Unit</span>
+                  <div class="seg" role="radiogroup" aria-labelledby="rs-unit-l">
+                    <label><input type="radio" name="rs-unit" id="rs-u-px" value="px" checked><span>Pixels</span></label>
+                    <label><input type="radio" name="rs-unit" id="rs-u-cm" value="cm"><span>cm</span></label>
+                    <label><input type="radio" name="rs-unit" id="rs-u-mm" value="mm"><span>mm</span></label>
+                    <label><input type="radio" name="rs-unit" id="rs-u-in" value="in"><span>inch</span></label>
+                  </div></div>
                 <div class="dims">
-                  <div class="field"><label for="rs-w">Width</label><input type="number" id="rs-w" min="1" max="10000" value="1200"></div>
+                  <div class="field"><label for="rs-w">Width</label><input type="number" id="rs-w" min="0" step="1" value="1200"></div>
                   <span class="x">×</span>
-                  <div class="field"><label for="rs-h">Height</label><input type="number" id="rs-h" min="1" max="10000" value="800"></div>
+                  <div class="field"><label for="rs-h">Height</label><input type="number" id="rs-h" min="0" step="1" value="800"></div>
                 </div>
+                <div class="field" id="rs-dpi-field" hidden><label for="rs-dpi">DPI</label>
+                  <select id="rs-dpi"><option value="72">72 DPI</option><option value="96">96 DPI</option><option value="150">150 DPI</option><option value="200">200 DPI</option><option value="300" selected>300 DPI</option><option value="600">600 DPI</option></select>
+                  <p class="help">Forms usually ask for 200 or 300 DPI. 3.5 × 4.5 cm at 300 DPI is 413 × 531 px.</p></div>
                 <label class="check"><input type="checkbox" id="rs-lock" checked> Keep aspect ratio</label>
                 <p class="help" id="rs-help">With aspect ratio kept, each image fits inside this box.</p>
               </div>
@@ -358,13 +399,13 @@
   </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
-<script src="/assets/hi.js?v=4"></script>
-<script src="/assets/i18n-core.js?v=4"></script>
-<script src="/assets/ui.js?v=4"></script>
+<script src="/assets/hi.js?v=5"></script>
+<script src="/assets/i18n-core.js?v=5"></script>
+<script src="/assets/ui.js?v=5"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>window.SARAL_PAGE={tool:"merge"};</script>
-<script src="/assets/app.js?v=4"></script>
+<script src="/assets/app.js?v=5"></script>
 </body>
 </html>
