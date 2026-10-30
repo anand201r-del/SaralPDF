@@ -19,7 +19,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,750&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/site.css?v=9">
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Article", "headline": "Photo and signature size: converting cm to pixels", "description": "Forms give photo sizes in cm or pixels. Learn the simple formula to convert cm to pixels, see common sizes, and resize your photo for free.", "url": "https://saralpdf.in/guides/photo-signature-size-cm-to-pixels/", "datePublished": "2026-10-28", "dateModified": "2026-10-28", "author": {"@type": "Person", "name": "Anand Kumar"}, "publisher": {"@type": "Organization", "name": "SaralPDF", "url": "https://saralpdf.in"}}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What DPI should I use?", "acceptedAnswer": {"@type": "Answer", "text": "Use the DPI the form mentions. If it doesn't mention one, the pixel size usually matters more than DPI. 200 or 300 DPI are common choices."}}, {"@type": "Question", "name": "Why does my resized photo look stretched?", "acceptedAnswer": {"@type": "Answer", "text": "The original shape didn't match the target shape. Crop the photo closer to the target shape first, then resize."}}]}]}</script>
 </head>
 <body>
@@ -27,7 +27,7 @@
   <header class="topbar">
     <a class="brand" href="/" aria-label="SaralPDF home"><span class="mark" aria-hidden="true"><span>PDF</span></span><span class="wordmark">Saral<b>PDF</b></span></a>
     <nav class="nav" aria-label="Main">
-      <a href="/#tools-sec" class="nav-hide">Tools</a>
+      <a href="/#tools-sec" class="nav-hide nav-tools"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="2" y="2" width="5" height="5" rx="1.2"/><rect x="9" y="2" width="5" height="5" rx="1.2"/><rect x="2" y="9" width="5" height="5" rx="1.2"/><rect x="9" y="9" width="5" height="5" rx="1.2"/></svg><span>All tools</span></a>
       <a href="/guides/" aria-current="page">Guides</a>
       <a href="/about/" class="nav-hide">About</a>
       <a href="/contact/" class="cta">Contact</a>
@@ -64,7 +64,7 @@
       <ol class="steps">
         <li>First crop the photo to the right shape with <a href="/crop-image/">Crop Image</a>, for example <strong>Passport photo 3.5 × 4.5 cm</strong>.</li>
         <li>Open the <a href="/resize-image/">Resize Image</a> tool and add your photo.</li>
-        <li>Choose <strong>Pixels</strong> and type the width and height.</li>
+        <li>Under <strong>Unit</strong>, choose <strong>cm</strong> and type the size from your form, for example 3.5 × 4.5. Set <strong>DPI</strong> to the value your form asks for (usually 200 or 300). SaralPDF shows the pixel size it will make. You can also choose <strong>Pixels</strong> and type them directly.</li>
         <li>For an exact size, untick <strong>Keep aspect ratio</strong>. If your crop was close to the right shape, the photo won't look stretched.</li>
         <li>Set <strong>Save as</strong> to <strong>JPG</strong> and tap <strong>Resize images</strong>.</li>
         <li>If the form also has a KB limit, open <a href="/compress-image/">Compress Image</a> next and compress the resized photo.</li>
