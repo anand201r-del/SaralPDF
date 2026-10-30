@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,750&family=Hanken+Grotesk:wght@400;500;600;650;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap">
-<link rel="stylesheet" href="/assets/app.css?v=6">
+<link rel="stylesheet" href="/assets/app.css?v=8">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "SaralPDF", "url": "https://saralpdf.in/", "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "INR"}, "description": "Free private PDF and image tools that run in your browser."}</script>
 </head>
 <body>
@@ -33,7 +33,7 @@
   </header>
 
   <section class="hero">
-    <div>
+    <div class="hero-main">
       <h1>Get your documents form-ready.</h1>
       <p>Make photos the right KB, join certificates into one PDF, crop passport photos and more. Everything happens on your phone or computer, and nothing is uploaded.</p>
       <div class="search">
@@ -41,17 +41,32 @@
         <label class="sr" for="tool-search">Search tools</label>
         <input type="text" id="tool-search" placeholder="What do you need? For example: photo 50 KB" autocomplete="off">
       </div>
-      <div class="quick"><span>Popular:</span>
-        <a class="chip" href="/exam-photo-signature/">Exam photo</a>
-        <a class="chip" href="/compress-image/">Photo under 50 KB</a>
-        <a class="chip" href="/merge-pdf/">Merge PDF</a>
-        <a class="chip" href="/convert-image/">HEIC to JPG</a>
-      </div>
+      <ul class="trust">
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 8.5l3 3 7-7"/></svg><span>Free, no sign-up</span></li>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg><span>Files never leave your device</span></li>
+        <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 8.5l3 3 7-7"/></svg><span>Works on mobile</span></li>
+      </ul>
     </div>
-    <div class="stamp" aria-hidden="true"><b>Nothing uploaded</b><small>Works on your device</small></div>
+    <aside class="sizes-card" aria-labelledby="sizes-h">
+      <div class="stamp" aria-hidden="true"><b>Nothing uploaded</b><small>Works on your device</small></div>
+      <h2 id="sizes-h">Need an exact size?</h2>
+      <p class="sc-sub">Tap the limit your form asks for.</p>
+      <div class="sc-row"><h3>Compress PDF to</h3><div class="chips"><a class="chip" href="/compress-pdf-to-100kb/" data-noi18n>100 KB</a><a class="chip" href="/compress-pdf-to-200kb/" data-noi18n>200 KB</a><a class="chip" href="/compress-pdf-to-300kb/" data-noi18n>300 KB</a><a class="chip" href="/compress-pdf-to-500kb/" data-noi18n>500 KB</a><a class="chip" href="/compress-pdf-to-1mb/" data-noi18n>1 MB</a><a class="chip" href="/compress-pdf-to-2mb/" data-noi18n>2 MB</a></div></div>
+      <div class="sc-row"><h3>Compress photo to</h3><div class="chips"><a class="chip" href="/compress-image-to-10kb/" data-noi18n>10 KB</a><a class="chip" href="/compress-image-to-20kb/" data-noi18n>20 KB</a><a class="chip" href="/compress-image-to-50kb/" data-noi18n>50 KB</a><a class="chip" href="/compress-image-to-100kb/" data-noi18n>100 KB</a><a class="chip" href="/compress-image-to-200kb/" data-noi18n>200 KB</a><a class="chip" href="/compress-image/">Other</a></div></div>
+      <div class="sc-row"><h3>Exam photo &amp; signature</h3><div class="chips"><a class="chip" href="/exam-photo-signature/?preset=ibps_photo">IBPS photo</a><a class="chip" href="/exam-photo-signature/?preset=ssc_sign">SSC signature</a><a class="chip" href="/exam-photo-signature/?preset=neet_photo">NEET photo</a><a class="chip" href="/exam-photo-signature/?preset=upsc_photo">UPSC photo</a></div></div>
+    </aside>
   </section>
 
 <section class="directory" id="tools-sec" aria-label="All tools"><div class="dgroup featured"><h2>For exam and job forms</h2><ul class="tlist"><li><a class="tool" href="/exam-photo-signature/" data-tool="exam" data-k="exam form photo signature ibps ssc neet upsc sbi bank railway परीक्षा फ़ोटो हस्ताक्षर"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="11" r="2.5"/><path d="M5.5 17c.6-2 2-3 3.5-3s2.9 1 3.5 3M15 9h3M15 12h3M15 15h2"/></svg></span><span class="t-title"><span class="t-name">Exam Photo &amp; Signature</span><span class="t-new">New</span></span><span class="t-desc">Exact size and KB for IBPS, SSC, NEET, UPSC</span></a></li><li><a class="tool" href="/compress-image/" data-tool="compress" data-k="compress reduce photo image kb 20kb 50kb 100kb size small छोटा कम साइज़"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h5V4M20 9h-5V4M4 15h5v5M20 15h-5v5"/></svg></span><span class="t-title"><span class="t-name">Compress Image</span></span><span class="t-desc">Make a photo fit a KB limit like 20 KB or 50 KB</span></a></li><li><a class="tool" href="/crop-image/" data-tool="crop" data-k="crop cut passport square photo trim क्रॉप काटें"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg></span><span class="t-title"><span class="t-name">Crop Image</span><span class="t-new">New</span></span><span class="t-desc">Cut to passport, square or any shape</span></a></li><li><a class="tool" href="/remove-background/" data-tool="bgremove" data-k="background remove white transparent cutout बैकग्राउंड"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="3.5"/><path d="M5 21c1-4 3.8-6 7-6s6 2 7 6"/><path d="M3 3h3M3 3v3M21 3h-3M21 3v3M3 21v-3M21 21v-3" /></svg></span><span class="t-title"><span class="t-name">Remove Background</span></span><span class="t-desc">White or transparent background with AI</span></a></li></ul></div><div class="dgroup"><h2>PDF tools</h2><ul class="tlist"><li><a class="tool" href="/image-to-pdf/" data-tool="img2pdf" data-k="jpg png photo image to pdf convert scan इमेज से पीडीएफ"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="11" height="9" rx="1.5"/><path d="M3 11l3-3 3 3 2-2 3 3"/><path d="M15 9h3.5L21 11.5V20a1 1 0 0 1-1 1h-8a1 1 0 0 1-1-1v-4"/></svg></span><span class="t-title"><span class="t-name">Image to PDF</span></span><span class="t-desc">Turn photos and scans into one PDF</span></a></li><li><a class="tool" href="/merge-pdf/" data-tool="merge" data-k="merge combine join pdf certificates जोड़ें"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3h6l4 4v9a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M4 7v12a2 2 0 0 0 2 2h9"/><path d="M10 10h5M10 13h5"/></svg></span><span class="t-title"><span class="t-name">Merge PDF</span></span><span class="t-desc">Join several PDFs in your order</span></a></li><li><a class="tool" href="/compress-pdf/" data-tool="pdfcompress" data-k="compress reduce pdf size mb kb 1mb 500kb 200kb छोटा"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M11.5 8v4m0 0l-2-2m2 2l2-2M11.5 18v-3m0 0l-2 2m2-2l2 2"/></svg></span><span class="t-title"><span class="t-name">Compress PDF</span></span><span class="t-desc">Shrink scans to fit upload limits</span></a></li><li><a class="tool" href="/pdf-to-image/" data-tool="pdf2img" data-k="pdf to jpg png image pages convert"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h7l4 4v4"/><path d="M5 3v14h5"/><rect x="12" y="13" width="9" height="8" rx="1.5"/><path d="M12 19l2.5-2.5 2 2 1.5-1.5 3 3"/></svg></span><span class="t-title"><span class="t-name">PDF to Image</span></span><span class="t-desc">Save pages as JPG or PNG</span></a></li></ul></div><div class="dgroup"><h2>Image tools</h2><ul class="tlist"><li><a class="tool" href="/resize-image/" data-tool="resize" data-k="resize pixels px width height dimensions cm साइज़ बदलें"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg></span><span class="t-title"><span class="t-name">Resize Image</span></span><span class="t-desc">Set exact width and height in pixels</span></a></li><li><a class="tool" href="/convert-image/" data-tool="convert" data-k="convert heic iphone jpg png webp format फ़ॉर्मेट"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg></span><span class="t-title"><span class="t-name">Convert Image</span><span class="t-new">New</span></span><span class="t-desc">HEIC to JPG, PNG and WebP</span></a></li><li><a class="tool" href="/enhance/" data-tool="enhance" data-k="enhance quality clear sharp scan shadow document सुधारें साफ़"><span class="t-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19L15 9"/><path d="M14 4l.8 2.2L17 7l-2.2.8L14 10l-.8-2.2L11 7l2.2-.8zM19 11l.5 1.5L21 13l-1.5.5L19 15l-.5-1.5L17 13l1.5-.5z"/></svg></span><span class="t-title"><span class="t-name">Enhance Quality</span></span><span class="t-desc">Clean up dark, shadowy scans and photos</span></a></li></ul></div><p class="no-match" id="no-match" hidden>No tool matches that. Try “compress”, “photo” or “PDF”.</p></section>
+
+  <aside class="promo" aria-labelledby="promo-h">
+    <span class="promo-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M3 13h18"/></svg></span>
+    <div class="promo-txt">
+      <h2 id="promo-h">Looking for a tech job?</h2>
+      <p>Get the latest IT and software job notifications for freshers on our sister site, TechFresherJobs.</p>
+    </div>
+    <a class="btn primary" href="https://techfresherjobs.com/" target="_blank" rel="noopener">See latest jobs ↗</a>
+  </aside>
 
   <section aria-labelledby="guides-h">
     <div class="section-h"><h2 id="guides-h">Step-by-step guides</h2><a href="/guides/">All guides</a></div>
@@ -65,7 +80,7 @@
   </section>
   <footer>
     <span>© 2026 SaralPDF. Made in India.</span>
-    <span class="foot-links"><a href="/guides/">Guides</a><a href="/about/">About</a><a href="/privacy/">Privacy Policy</a><a href="/terms/">Terms</a><a href="/contact/">Contact</a></span>
+    <span class="foot-links"><a href="/guides/">Guides</a><a href="/about/">About</a><a href="/privacy/">Privacy Policy</a><a href="/terms/">Terms</a><a href="/contact/">Contact</a><a href="https://techfresherjobs.com/" target="_blank" rel="noopener">Tech fresher jobs ↗</a></span>
   </footer>
 </div>
 <div class="modal-bg" id="fb-modal" hidden>
@@ -81,8 +96,8 @@
   </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
-<script src="/assets/hi.js?v=6"></script>
-<script src="/assets/i18n-core.js?v=6"></script>
-<script src="/assets/ui.js?v=6"></script>
+<script src="/assets/hi.js?v=8"></script>
+<script src="/assets/i18n-core.js?v=8"></script>
+<script src="/assets/ui.js?v=8"></script>
 </body>
 </html>
