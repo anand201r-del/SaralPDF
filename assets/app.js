@@ -9,17 +9,17 @@ if(window.pdfjsLib){try{pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cl
 
 /* ---------- tools ---------- */
 const TOOLS={
-  img2pdf:{name:"Image to PDF",hint:"JPG → PDF",accept:"image",reorder:true,lede:"Turn photos and scans into <strong>one PDF</strong>. Each image becomes a page, in the order shown.",btn:"Create PDF",min:1},
-  merge:{name:"Merge PDF",hint:"PDF + PDF",accept:"pdf",reorder:true,lede:"Join several PDFs into <strong>one file</strong>, in the order shown.",btn:"Merge PDFs",min:2},
-  pdfcompress:{name:"Compress PDF",hint:"PDF → KB",accept:"pdf",lede:"Make PDFs <strong>small enough to upload or email</strong>. Works best on scanned documents and image-heavy files.",btn:"Compress PDFs",min:1},
-  pdf2img:{name:"PDF to Image",hint:"PDF → JPG",accept:"pdf",lede:"Save each page of a PDF as a <strong>JPG or PNG</strong>. Several pages download together as a ZIP.",btn:"Convert pages",min:1},
-  compress:{name:"Compress Image",hint:"MB → KB",accept:"image",lede:"Shrink photos for <strong>online forms, email and WhatsApp</strong>. Pick a quality, or set an exact KB limit.",btn:"Compress images",min:1},
-  resize:{name:"Resize Image",hint:"W × H",accept:"image",lede:"Change image dimensions in <strong>pixels or by percentage</strong>.",btn:"Resize images",min:1},
-  crop:{name:"Crop Image",hint:"✂ RATIO",accept:"image",editor:true,isNew:true,lede:"Cut out the part you need. Drag the box, or pick a ratio like <strong>passport 3.5 × 4.5 cm</strong> or <strong>1:1</strong>. You can also rotate and flip.",btn:"Crop images",min:1},
-  exam:{name:"Exam Photo & Signature",hint:"SSC · IBPS · NEET",accept:"image",editor:true,isNew:true,lede:"Make your photo or signature match an exam form in one step: <strong>exact size in pixels and the right KB range</strong>.",btn:"Make exam file",min:1},
-  convert:{name:"Convert Image",hint:"HEIC · JPG · PNG",accept:"image",isNew:true,lede:"Change image format: <strong>iPhone HEIC to JPG</strong>, PNG to JPG, JPG to PNG, or to WebP.",btn:"Convert images",min:1},
-  enhance:{name:"Enhance Quality",hint:"IMG · PDF",accept:"any",lede:"Make photos <strong>brighter and sharper</strong>, and turn grey, shadowy phone scans into <strong>clean white pages with dark text</strong>. Works on images and every page of a PDF.",btn:"Enhance",min:1},
-  bgremove:{name:"Remove Background",hint:"AI · PNG",accept:"image",lede:"Cut out the person or object in a photo and get a <strong>transparent PNG</strong>, or place it on white for ID and form photos. The AI model downloads once, then runs on your device.",btn:"Remove background",min:1}
+  img2pdf:{h1:"Convert images to PDF",name:"Image to PDF",hint:"JPG → PDF",accept:"image",reorder:true,lede:"Turn photos and scans into <strong>one PDF</strong>. Each image becomes a page, in the order shown.",btn:"Create PDF",min:1},
+  merge:{h1:"Merge PDF files into one",name:"Merge PDF",hint:"PDF + PDF",accept:"pdf",reorder:true,lede:"Join several PDFs into <strong>one file</strong>, in the order shown.",btn:"Merge PDFs",min:2},
+  pdfcompress:{h1:"Compress PDF to reduce file size",name:"Compress PDF",hint:"PDF → KB",accept:"pdf",lede:"Make PDFs <strong>small enough to upload or email</strong>. Works best on scanned documents and image-heavy files.",btn:"Compress PDFs",min:1},
+  pdf2img:{h1:"Convert PDF to JPG or PNG",name:"PDF to Image",hint:"PDF → JPG",accept:"pdf",lede:"Save each page of a PDF as a <strong>JPG or PNG</strong>. Several pages download together as a ZIP.",btn:"Convert pages",min:1},
+  compress:{h1:"Compress images to an exact KB size",name:"Compress Image",hint:"MB → KB",accept:"image",lede:"Shrink photos for <strong>online forms, email and WhatsApp</strong>. Pick a quality, or set an exact KB limit.",btn:"Compress images",min:1},
+  resize:{h1:"Resize images in pixels or percent",name:"Resize Image",hint:"W × H",accept:"image",lede:"Change image dimensions in <strong>pixels or by percentage</strong>.",btn:"Resize images",min:1},
+  crop:{h1:"Crop images online",name:"Crop Image",hint:"✂ RATIO",accept:"image",editor:true,isNew:true,lede:"Cut out the part you need. Drag the box, or pick a ratio like <strong>passport 3.5 × 4.5 cm</strong> or <strong>1:1</strong>. You can also rotate and flip.",btn:"Crop images",min:1},
+  exam:{h1:"Exam photo and signature resizer",name:"Exam Photo & Signature",hint:"SSC · IBPS · NEET",accept:"image",editor:true,isNew:true,lede:"Make your photo or signature match an exam form in one step: <strong>exact size in pixels and the right KB range</strong>.",btn:"Make exam file",min:1},
+  convert:{h1:"Convert images: HEIC, JPG, PNG, WebP",name:"Convert Image",hint:"HEIC · JPG · PNG",accept:"image",isNew:true,lede:"Change image format: <strong>iPhone HEIC to JPG</strong>, PNG to JPG, JPG to PNG, or to WebP.",btn:"Convert images",min:1},
+  enhance:{h1:"Enhance photos and scanned documents",name:"Enhance Quality",hint:"IMG · PDF",accept:"any",lede:"Make photos <strong>brighter and sharper</strong>, and turn grey, shadowy phone scans into <strong>clean white pages with dark text</strong>. Works on images and every page of a PDF.",btn:"Enhance",min:1},
+  bgremove:{h1:"Remove the background from a photo",name:"Remove Background",hint:"AI · PNG",accept:"image",lede:"Cut out the person or object in a photo and get a <strong>transparent PNG</strong>, or place it on white for ID and form photos. The AI model downloads once, then runs on your device.",btn:"Remove background",min:1}
 };
 const SLUG={img2pdf:"image-to-pdf",merge:"merge-pdf",pdfcompress:"compress-pdf",pdf2img:"pdf-to-image",compress:"compress-image",resize:"resize-image",crop:"crop-image",exam:"exam-photo-signature",convert:"convert-image",enhance:"enhance",bgremove:"remove-background"};
 const FROM_SLUG=Object.fromEntries(Object.entries(SLUG).map(([k,v])=>[v,k]));
@@ -326,7 +326,7 @@ async function continueWith(k){
 }
 function render(){
   const tool=TOOLS[st.tool];
-  renderTools();
+  renderTools();syncHeading();
   $("#lede").innerHTML=t(tool.lede);
   const has=st.files.length>0;$("#work").classList.toggle("has-files",has);
   $("#drop-title").textContent=has?t("Add more files"):tool.accept==="any"?t("Drop images or PDFs here"):tool.accept==="pdf"?t("Drop PDF files here"):t("Drop images here");
@@ -343,6 +343,16 @@ function render(){
   document.querySelectorAll("[data-for]").forEach(el=>el.hidden=!el.dataset.for.split(" ").includes(st.tool));
   document.querySelectorAll("[data-tool-content]").forEach(el=>el.hidden=el.dataset.toolContent!==st.tool);
   renderFiles();updateRun();renderResults();showErrors();renderEditor();
+}
+
+/* heading and breadcrumb follow the tool when switching in place; the page's own heading is restored when coming back */
+const heroH1=$(".tool-hero h1"),heroCrumbs=$(".tool-hero .crumbs");
+const heroOrig={h1:heroH1&&heroH1.innerHTML,crumbs:heroCrumbs&&heroCrumbs.innerHTML};
+function syncHeading(){
+  if(!heroH1)return;const own=st.tool===(page.tool||st.tool);
+  if(own){if(heroH1.hasAttribute("data-noi18n")){heroH1.innerHTML=heroOrig.h1;heroCrumbs.innerHTML=heroOrig.crumbs;heroH1.removeAttribute("data-noi18n");heroCrumbs.removeAttribute("data-noi18n");I.apply();}return;}
+  const tool=TOOLS[st.tool];heroH1.setAttribute("data-noi18n","");heroCrumbs.setAttribute("data-noi18n","");
+  heroH1.textContent=t(tool.h1);heroCrumbs.innerHTML='<a href="/">'+esc(t("Home"))+'</a><span>/</span><span>'+esc(t(tool.name))+'</span>';
 }
 
 /* ---------- progress ---------- */
