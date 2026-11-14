@@ -17,7 +17,7 @@ window.SARAL_HI={
 "Make PDFs <strong>small enough to upload or email</strong>. Works best on scanned documents and image-heavy files.":"PDF को <strong>अपलोड या ईमेल लायक छोटा</strong> करें। स्कैन किए डॉक्यूमेंट और इमेज वाली फ़ाइलों पर सबसे अच्छा काम करता है।",
 "Save each page of a PDF as a <strong>JPG or PNG</strong>. Several pages download together as a ZIP.":"PDF के हर पेज को <strong>JPG या PNG</strong> इमेज में सेव करें। कई पेज एक साथ ZIP में मिलेंगे।",
 "Shrink photos for <strong>online forms, email and WhatsApp</strong>. Pick a quality, or set an exact KB limit.":"<strong>ऑनलाइन फ़ॉर्म, ईमेल और WhatsApp</strong> के लिए फ़ोटो छोटी करें। क्वालिटी चुनें या सही KB सीमा डालें।",
-"Change image dimensions in <strong>pixels or by percentage</strong>.":"इमेज का साइज़ <strong>पिक्सेल या प्रतिशत</strong> में बदलें।",
+"Change image dimensions in <strong>pixels, cm, mm or inches</strong>, or by percentage.":"इमेज का साइज़ <strong>पिक्सेल, cm, mm या इंच</strong> में, या प्रतिशत से बदलें।",
 "Cut out the part you need. Drag the box, or pick a ratio like <strong>passport 3.5 × 4.5 cm</strong> or <strong>1:1</strong>. You can also rotate and flip.":"ज़रूरी हिस्सा काटें। बॉक्स खींचें या <strong>पासपोर्ट 3.5 × 4.5 cm</strong> या <strong>1:1</strong> जैसा अनुपात चुनें। घुमा और पलट भी सकते हैं।",
 "Make your photo or signature match an exam form in one step: <strong>exact size in pixels and the right KB range</strong>.":"अपनी फ़ोटो या हस्ताक्षर को एक ही बार में परीक्षा फ़ॉर्म के अनुसार बनाएँ: <strong>पिक्सेल में सही साइज़ और सही KB सीमा</strong>।",
 "Change image format: <strong>iPhone HEIC to JPG</strong>, PNG to JPG, JPG to PNG, or to WebP.":"इमेज फ़ॉर्मेट बदलें: <strong>iPhone HEIC से JPG</strong>, PNG से JPG, JPG से PNG, या WebP में।",
@@ -120,7 +120,7 @@ window.SARAL_HI={
 "Found a bug, or want a new tool such as Split PDF or exam photo presets? Tell us and it may be in the next update.":"कोई गड़बड़ी मिली, या Split PDF जैसा नया टूल चाहिए? हमें बताएँ, अगले अपडेट में आ सकता है।","Send feedback":"सुझाव भेजें",
 "Found a bug, or want a new tool? Email us and mention which tool you used. We read every message.":"कोई गड़बड़ी मिली या नया टूल चाहिए? हमें ईमेल करें और बताएँ कौन-सा टूल इस्तेमाल किया। हम हर संदेश पढ़ते हैं।","Copy":"कॉपी करें","Open in Gmail":"Gmail में खोलें","Use email app":"ईमेल ऐप से भेजें","Close":"बंद करें","Email address copied":"ईमेल पता कॉपी हो गया","Press Ctrl + C to copy":"कॉपी करने के लिए Ctrl + C दबाएँ",
 /* tool page headings */
-"Convert images to PDF":"इमेज को PDF में बदलें","Merge PDF files into one":"PDF फ़ाइलों को एक में जोड़ें","Compress PDF to reduce file size":"PDF का साइज़ छोटा करें","Convert PDF to JPG or PNG":"PDF को JPG या PNG में बदलें","Compress images to an exact KB size":"इमेज को सही KB साइज़ में छोटा करें","Resize images in pixels or percent":"इमेज का साइज़ पिक्सेल या प्रतिशत में बदलें","Crop images online":"इमेज ऑनलाइन क्रॉप करें","Exam photo and signature resizer":"परीक्षा फ़ोटो और हस्ताक्षर रीसाइज़र","Convert images: HEIC, JPG, PNG, WebP":"इमेज फ़ॉर्मेट बदलें: HEIC, JPG, PNG, WebP","Enhance photos and scanned documents":"फ़ोटो और स्कैन डॉक्यूमेंट सुधारें","Remove the background from a photo":"फ़ोटो से बैकग्राउंड हटाएँ",
+"Convert images to PDF":"इमेज को PDF में बदलें","Merge PDF files into one":"PDF फ़ाइलों को एक में जोड़ें","Compress PDF to reduce file size":"PDF का साइज़ छोटा करें","Convert PDF to JPG or PNG":"PDF को JPG या PNG में बदलें","Compress images to an exact KB size":"इमेज को सही KB साइज़ में छोटा करें","Resize images in pixels, cm or inches":"इमेज का साइज़ पिक्सेल, cm या इंच में बदलें","Crop images online":"इमेज ऑनलाइन क्रॉप करें","Exam photo and signature resizer":"परीक्षा फ़ोटो और हस्ताक्षर रीसाइज़र","Convert images: HEIC, JPG, PNG, WebP":"इमेज फ़ॉर्मेट बदलें: HEIC, JPG, PNG, WebP","Enhance photos and scanned documents":"फ़ोटो और स्कैन डॉक्यूमेंट सुधारें","Remove the background from a photo":"फ़ोटो से बैकग्राउंड हटाएँ",
 /* tool page steps */
 "Add your photos or scans (JPG, PNG, WebP or iPhone HEIC).":"अपनी फ़ोटो या स्कैन जोड़ें (JPG, PNG, WebP या iPhone HEIC)।","Drag them into the right page order.":"उन्हें सही पेज क्रम में खींचें।","Choose the page size, orientation and margin.":"पेज साइज़, दिशा और किनारा चुनें।","Tap Create PDF and save your file.":"“PDF बनाएँ” दबाएँ और फ़ाइल सेव करें।",
 "Add two or more PDF files.":"दो या ज़्यादा PDF फ़ाइलें जोड़ें।","Drag the files into the order you want.":"फ़ाइलों को अपने मनचाहे क्रम में खींचें।","Type a name for the new file.":"नई फ़ाइल का नाम लिखें।","Tap Merge PDFs and save.":"“PDF जोड़ें” दबाएँ और सेव करें।",
@@ -196,7 +196,7 @@ window.SARAL_HI={
 "Related tools":"इससे जुड़े टूल्स",
 "Save pages as JPG or PNG":"पेज JPG या PNG में सेव करें",
 "Search tools":"टूल खोजें",
-"Set exact width and height in pixels":"पिक्सेल में सही चौड़ाई और ऊँचाई रखें",
+"Exact size in pixels, cm or inches":"पिक्सेल, cm या इंच में सही साइज़",
 "Shrink scans to fit upload limits":"स्कैन को अपलोड सीमा तक छोटा करें",
 "Start over with new files":"नई फ़ाइलों के साथ फिर शुरू करें",
 "Try with an example":"उदाहरण से आज़माएँ",
