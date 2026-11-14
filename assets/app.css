@@ -362,16 +362,19 @@ footer{color:var(--muted);font-size:13.5px;display:flex;flex-wrap:wrap;justify-c
 .fit.ok{background:var(--good-soft,#e3f5ea);color:var(--good)}
 .fit.no{background:var(--bad-soft);color:var(--bad)}
 
-/* ---------- TechFresher Jobs (sister site) ---------- */
-.promo{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px 28px;align-items:center;background:linear-gradient(135deg,#0b1a33,#12284a);color:#fff;border-radius:var(--r-lg);padding:24px 28px;box-shadow:var(--shadow-1)}
-.promo-brand{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:#cfe3ff}
-.promo-ico{width:30px;height:30px;border-radius:8px;background:#0f7a55;color:#fff;display:flex;align-items:center;justify-content:center}
-.promo-ico svg{width:17px;height:17px}
-.promo h2{margin:10px 0 0;font:750 24px/1.15 var(--f-display);letter-spacing:-.02em;color:#fff}
-.promo p{margin:6px 0 0;font-size:14.5px;color:#b9c6dc;max-width:60ch}
-.promo-btn{display:inline-flex;align-items:center;gap:8px;background:#0f7a55;color:#fff;font-weight:700;font-size:15px;text-decoration:none;padding:13px 22px;border-radius:12px;white-space:nowrap}
-.promo-btn:hover{background:#0b6345}
-@media (max-width:620px){.promo{grid-template-columns:minmax(0,1fr);padding:20px}.promo-btn{justify-content:center}}
-.foot-links a.tfj-link,.tfj-link{display:inline-flex;align-items:center;gap:6px;color:#fff;background:#0f7a55;font-weight:700;padding:6px 12px;border-radius:999px;text-decoration:none}
-.foot-links a.tfj-link:hover{background:#0b6345;color:#fff}
-.tfj-link svg{width:15px;height:15px}
+/* ---------- TechFresher Jobs (sister site): its own navy #06244d, green #097f47, highlight #00e676 ---------- */
+.promo{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px 28px;align-items:center;background:radial-gradient(900px 300px at 85% -20%,rgba(0,230,118,.18),transparent 60%),linear-gradient(180deg,#06244d,#10233f);color:#fff;border-radius:var(--r-lg);padding:24px 28px;box-shadow:var(--shadow-1)}
+.promo-brand{display:inline-flex;align-items:center;gap:10px}
+.promo-brand .tfj-logo{height:36px;width:auto}
+.tfj-name{font-weight:800;font-size:17px;letter-spacing:-.02em;color:#fff;white-space:nowrap}
+.tfj-name b{font-weight:800;color:#00e676}
+.promo h2{margin:12px 0 0;font:750 26px/1.15 var(--f-display);letter-spacing:-.02em;color:#fff}
+.promo-hl{color:#00e676}
+.promo p{margin:6px 0 0;font-size:14.5px;color:#c4d0e3;max-width:62ch}
+.promo-btn{display:inline-flex;align-items:center;gap:8px;background:#097f47;color:#fff;font-weight:700;font-size:15px;text-decoration:none;padding:13px 22px;border-radius:12px;white-space:nowrap}
+.promo-btn:hover{background:#066537}
+@media (max-width:620px){.promo{grid-template-columns:minmax(0,1fr);padding:20px}.promo-btn{justify-content:center}.promo h2{font-size:22px}}
+.foot-links a.tfj-link,.tfj-link{display:inline-flex;align-items:center;gap:7px;background:#06244d;font-weight:700;padding:5px 12px 5px 8px;border-radius:999px;text-decoration:none}
+.foot-links a.tfj-link:hover{background:#0b3266}
+.tfj-link .tfj-logo{height:20px;width:auto}
+.tfj-link .tfj-name{font-size:13.5px}
